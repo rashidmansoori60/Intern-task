@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:gravity="center"
+    android:padding="24dp"
+    tools:context=".Fragments.SplashFragment"
+    >
+
+    <!-- App logo -->
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:src="@drawable/todoapp"
+        android:contentDescription="@string/app_logo"
+        android:scaleType="centerInside"
+        android:layout_gravity="center"
+        android:elevation="4dp" />
+
+    <!-- Optional app name text below logo -->
+    <TextView
+        android:id="@+id/tvAppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:text="@string/welcome_to_todo_app"
+        android:textColor="@color/purple_700"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.02" />
+
+</LinearLayout>
+
