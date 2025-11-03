@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <!-- 🖼 Product Image -->
+        <ImageView
+            android:id="@+id/product_img"
+            android:layout_width="130dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/baseline_block_24"
+            android:background="@drawable/image_bg"
+            android:layout_marginEnd="10dp"/>
+
+        <!-- 📝 Product Details -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/product_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Wireless Headphones"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:textColor="#222"/>
+
+            <TextView
+                android:id="@+id/product_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Crystal clear sound • 20hr battery"
+                android:textSize="13sp"
+                android:textColor="#666"
+                android:maxLines="2"
+                android:layout_marginTop="4dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                >
+
+            <TextView
+                android:id="@+id/product_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₹2,499"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#E53935"
+                android:layout_marginTop="6dp"/>
+
+                <ImageView
+                    android:id="@+id/add_to_cart_img"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:textAllCaps="false"
+                    android:src="@drawable/outline_favorite_24"
+                    android:layout_marginStart="70dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:backgroundTint="#FF9800"
+                    android:layout_marginTop="8dp"/>
+
+        </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+

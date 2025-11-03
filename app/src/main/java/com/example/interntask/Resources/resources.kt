@@ -14,7 +14,7 @@ sealed class ValidateState() {
 
 data class RagistationFaild(val email: ValidateState,
                             val pass: ValidateState,
-                            val correctpass: ValidateState)
+                            val correctpass: ValidateState,val name: ValidateState)
 
 sealed class Resourcesstate<T>(
     val data:T?=null,

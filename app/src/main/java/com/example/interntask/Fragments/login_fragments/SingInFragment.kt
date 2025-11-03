@@ -1,12 +1,12 @@
-package com.example.interntask.Fragments
+package com.example.interntask.Fragments.login_fragments
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
@@ -17,9 +17,7 @@ import com.example.interntask.Resources.Resourcesstate
 import com.example.interntask.Resources.ValidateState
 import com.example.interntask.databinding.FragmentSingInBinding
 import com.example.interntask.viewmodels.LoginVm
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SingInFragment : Fragment() {
@@ -41,7 +39,8 @@ class SingInFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvGoToSignUp.setOnClickListener {
-            findNavController().navigate(R.id.action_singInFragment_to_singUpFragment,null,
+            findNavController().navigate(
+                R.id.action_singInFragment_to_singUpFragment,null,
                 NavOptions.Builder().setPopUpTo(R.id.singInFragment,true).build())
         }
 
@@ -72,8 +71,8 @@ class SingInFragment : Fragment() {
                          binding.btnSignIn.visibility= View.VISIBLE
                          binding.progSignin.visibility= View.GONE
                          val intent = Intent(requireContext(), DashBoardActivity::class.java)
+                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                          startActivity(intent)
-                         requireActivity().supportFragmentManager.popBackStack()
 
                      }
                      is Resourcesstate.Error->{

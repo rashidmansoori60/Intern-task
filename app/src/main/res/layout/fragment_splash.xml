@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,31 +9,47 @@
     android:background="@color/white"
     android:gravity="center"
     android:padding="24dp"
-    tools:context=".Fragments.SplashFragment"
+    tools:context=".Fragments.login_fragments.SplashFragment"
     >
 
-    <!-- App logo -->
+
     <ImageView
         android:id="@+id/imgLogo"
         android:layout_width="160dp"
         android:layout_height="160dp"
-        android:src="@drawable/todoapp"
-        android:contentDescription="@string/app_logo"
-        android:scaleType="centerInside"
         android:layout_gravity="center"
-        android:elevation="4dp" />
+        android:contentDescription="@string/app_logo"
+        android:elevation="4dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/todoapp"
+        app:layout_constraintBottom_toTopOf="@+id/tvAppName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Optional app name text below logo -->
     <TextView
         android:id="@+id/tvAppName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="24dp"
+        android:letterSpacing="0.02"
         android:text="@string/welcome_to_todo_app"
         android:textColor="@color/purple_700"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:letterSpacing="0.02" />
+        app:layout_constraintBottom_toTopOf="@+id/splash_progress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/splash_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 

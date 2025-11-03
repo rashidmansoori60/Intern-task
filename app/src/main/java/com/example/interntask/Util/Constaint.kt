@@ -36,3 +36,9 @@ fun validcorrectPass(pass1:String,pass2:String): ValidateState{
 
    return ValidateState.Error("invalid")
 }
+fun validateName(name: String): ValidateState{
+    if(name.isEmpty()){
+        return ValidateState.Error("Mandatory to fill this requirement")
+    }
+    return ValidateState.Success
+}

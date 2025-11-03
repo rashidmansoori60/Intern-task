@@ -7,37 +7,56 @@
 
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.example.interntask.Fragments.SplashFragment"
+        android:name="com.example.interntask.Fragments.login_fragments.SplashFragment"
         android:label="SplashFragment" >
         <action
             android:id="@+id/action_splashFragment_to_singInFragment"
             app:destination="@id/singInFragment"
+            app:enterAnim="@anim/bottom_to_top"
+            app:exitAnim="@anim/fragment_to_left"
+            app:popEnterAnim="@anim/fragment_to_left"
+            app:popExitAnim="@anim/left_to_right"
             app:popUpTo="@id/splashFragment"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_dashBoardActivity"
+            app:destination="@id/dashBoardActivity" />
     </fragment>
     <fragment
         android:id="@+id/singInFragment"
-        android:name="com.example.interntask.Fragments.SingInFragment"
+        android:name="com.example.interntask.Fragments.login_fragments.SingInFragment"
         android:label="SingInFragment" >
         <action
             android:id="@+id/action_singInFragment_to_singUpFragment"
-            app:destination="@id/singUpFragment" />
+            app:destination="@id/singUpFragment"
+            app:enterAnim="@anim/left_to_right"
+            app:exitAnim="@anim/fragment_to_left"
+            app:popExitAnim="@anim/left_to_right"
+            app:popEnterAnim="@anim/fragment_to_left" />
         <action
             android:id="@+id/action_singInFragment_to_varificationFragment"
             app:destination="@id/varificationFragment" />
         <action
             android:id="@+id/action_singInFragment_to_dashBoardActivity"
             app:destination="@id/dashBoardActivity"
+            app:enterAnim="@anim/left_to_right"
+            app:exitAnim="@anim/fragment_to_left"
+            app:popEnterAnim="@anim/fragment_to_left"
+            app:popExitAnim="@anim/left_to_right"
             app:popUpTo="@id/singInFragment"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/singUpFragment"
-        android:name="com.example.interntask.Fragments.SingUpFragment"
+        android:name="com.example.interntask.Fragments.login_fragments.SingUpFragment"
         android:label="SingUpFragment" >
         <action
             android:id="@+id/action_singUpFragment_to_singInFragment"
-            app:destination="@id/singInFragment" />
+            app:destination="@id/singInFragment"
+            app:enterAnim="@anim/left_to_right"
+            app:exitAnim="@anim/fragment_to_left"
+            app:popEnterAnim="@anim/fragment_to_left"
+            app:popExitAnim="@anim/left_to_right" />
         <action
             android:id="@+id/action_singUpFragment_to_varificationFragment"
             app:destination="@id/varificationFragment" />

@@ -1,11 +1,11 @@
-package com.example.interntask.Fragments
+package com.example.interntask.Fragments.login_fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
@@ -14,9 +14,9 @@ import com.example.interntask.R
 import com.example.interntask.Resources.Resourcesstate
 import com.example.interntask.Resources.ValidateState
 import com.example.interntask.databinding.FragmentSingUpBinding
+import com.example.interntask.model.User
 import com.example.interntask.viewmodels.SingUpVm
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.toString
 
 @AndroidEntryPoint
 class SingUpFragment : Fragment() {
@@ -41,31 +41,51 @@ class SingUpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvGoToSignIn.setOnClickListener {
-            findNavController().navigate(R.id.action_singUpFragment_to_singInFragment,null,
+            findNavController().navigate(
+                R.id.action_singUpFragment_to_singInFragment,null,
                 NavOptions.Builder().setPopUpTo(R.id.singInFragment,true).build())
         }
+
+
 
         binding.btnSignUp.setOnClickListener {
             val email=binding.edtEmail.text.toString().trim()
             val pass=binding.edtPassword.text.toString().trim()
+            val name=binding.edtFirstName.text.toString().trim()
+            val lastname=binding.edtLastName.text.toString().trim()
             val comformpss=binding.edtConfirmPassword.text.toString().trim()
 
-            singUpVm.singUp(email,pass,comformpss)
 
-        }
 
-        lifecycleScope.launchWhenStarted {
-            singUpVm.movetoDashboard.collect { it
-            if(it){
-                findNavController().navigate(R.id.action_singUpFragment_to_singInFragment,null,
-                    NavOptions.Builder().setPopUpTo(R.id.singUpFragment,true).build())
-            }
-            }
+            singUpVm.singUp(email,pass,comformpss,name)
+
+
         }
 
         binding.btnSignUpemailckek.setOnClickListener {
-            singUpVm.checkEmailVerification()
+            val email = binding.edtEmail.text.toString().trim()
+            val name = binding.edtFirstName.text.toString().trim()
+            val lastname = binding.edtLastName.text.toString().trim()
+            val userown = User(email, name, lastname,"")
+
+            singUpVm.checkEmailVerification(userown)
         }
+
+        lifecycleScope.launchWhenStarted {
+            singUpVm.movetoDashboard.collect { navigate ->
+                if (navigate) {
+                    val navController = findNavController()
+                    if (navController.currentDestination?.id == R.id.singUpFragment) {
+                        navController.navigate(
+                            R.id.action_singUpFragment_to_singInFragment,
+                            null,
+                            NavOptions.Builder().setPopUpTo(R.id.singUpFragment, true).build()
+                        )
+                    }
+                }
+            }
+        }
+
         lifecycleScope.launchWhenStarted {
             singUpVm.checkEmailVisible.collect { isVisible ->
                 binding.btnSignUpemailckek.visibility =
@@ -85,6 +105,9 @@ class SingUpFragment : Fragment() {
                 if(it.correctpass is ValidateState.Error){
                     binding.edtConfirmPassword.setError(it.correctpass.message)
                 }
+                if(it.name is ValidateState.Error){
+                    binding.edtFirstName.setError(it.name.message)
+                }
         }
         }
 
@@ -99,8 +122,7 @@ class SingUpFragment : Fragment() {
                 is Resourcesstate.Success ->{
                     binding.progSingUp.visibility= View.GONE
                     binding.btnSignUp.visibility= View.VISIBLE
-                    findNavController().navigate(R.id.action_singUpFragment_to_singInFragment,null,
-                        NavOptions.Builder().setPopUpTo(R.id.singUpFragment,true).build())
+
                 }
                 is Resourcesstate.Error ->{
 
