@@ -1,14 +1,14 @@
 package com.example.interntask.Activity
-
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.fragment.app.Fragment
+import com.example.interntask.Fragments.shoping_fragment.CartFragment
+import com.example.interntask.Fragments.shoping_fragment.HomeFragment
+import com.example.interntask.Fragments.shoping_fragment.ProfileFragment
+import com.example.interntask.Fragments.shoping_fragment.Top_dealsFragment
 import com.example.interntask.R
 import com.example.interntask.databinding.ActivityDashBoardBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,6 +16,13 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DashBoardActivity : AppCompatActivity() {
 
+    private lateinit var homeFragment: HomeFragment
+    private lateinit var topDealsfragment : Top_dealsFragment
+    private lateinit var cartFragment: CartFragment
+    private lateinit var profileFragment: ProfileFragment
+
+
+    private var activeFragment: Fragment? = null
     private val binding by lazy {
         ActivityDashBoardBinding.inflate(layoutInflater)
     }
@@ -31,26 +38,49 @@ class DashBoardActivity : AppCompatActivity() {
             insets
         }
 
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.shoping_nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        homeFragment = HomeFragment()
+        topDealsfragment = Top_dealsFragment()
+        cartFragment = CartFragment()
+        profileFragment = ProfileFragment()
+
+        supportFragmentManager.beginTransaction()
+            .add(R.id.framlayout,homeFragment,"homefragment")
+            .add(R.id.framlayout,topDealsfragment,"top_dealsfragment").hide(topDealsfragment)
+            .add(R.id.framlayout,cartFragment,"cartfragment").hide(cartFragment)
+            .add(R.id.framlayout,profileFragment,"profilefragment").hide(profileFragment)
+            .commit()
+
+            activeFragment=homeFragment
+
+
+
+
 
         binding.bottomNavigation.setOnItemSelectedListener { item ->
-            val builder = NavOptions.Builder()
-                .setLaunchSingleTop(true)
-                .setRestoreState(true)
-                .setPopUpTo(navController.graph.startDestinationId, false)
+            when (item.itemId)
+            {
+                R.id.homeFragment ->showfragment(homeFragment)
 
-            try {
-                navController.navigate(item.itemId, null, builder.build())
-                true
-            } catch (e: IllegalArgumentException) {
-                false
+                R.id.top_dealsFragment->showfragment(topDealsfragment)
+
+                R.id.cartFragment->showfragment(cartFragment)
+
+                R.id.profileFragment->showfragment(profileFragment)
             }
+            true
         }
 
-        binding.bottomNavigation.setOnItemReselectedListener {
-            // Do nothing
-        }
+
+
     }
+
+   private fun showfragment(fragment: Fragment){
+        if (fragment == activeFragment) return
+        supportFragmentManager.beginTransaction()
+            .hide(activeFragment!!)
+            .show(fragment)
+            .commit()
+        activeFragment = fragment
+    }
+
 }

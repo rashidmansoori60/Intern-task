@@ -1,6 +1,7 @@
 package com.example.interntask.Fragments.shoping_fragment
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.interntask.Activity.MainActivity
 import com.example.interntask.R
 import com.example.interntask.Resources.Resourcesstate
@@ -52,11 +57,12 @@ class ProfileFragment : Fragment() {
         Log.e("profile", "oncreateview")
 
         binding.llLogout.setOnClickListener {
+            auth.signOut()
             val intent= Intent(requireContext(), MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             intent.putExtra("openLogin", true)
             startActivity(intent)
-            auth.signOut()
+
         }
 
         lifecycleScope.launchWhenStarted {
@@ -67,6 +73,7 @@ class ProfileFragment : Fragment() {
                         binding.profileProgress.visibility= View.VISIBLE
                     }
                     is Resourcesstate.Success ->{
+                        loadProfileimage()
                         binding.profileProgress.visibility= View.GONE
                         setupView(it.data!!)
                     }
@@ -87,7 +94,33 @@ class ProfileFragment : Fragment() {
     fun setupView(user: User){
        binding.tvUserName.text=user.name
         binding.tvUserEmail.text=user.email
-        Glide.with(requireContext()).load("https://avatar.iran.liara.run/public/17").into(binding.profileImage)
+
+    }
+    private fun loadProfileimage(){
+        Glide.with(this)
+            .load("https://avatar.iran.liara.run/public/17")
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable?>,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    binding.imageProgress.visibility= View.GONE
+                    return false
+                }
+                override fun onResourceReady(
+                    resource: Drawable,
+                    model: Any,
+                    target: Target<Drawable?>?,
+                    dataSource: DataSource,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    binding.imageProgress.visibility= View.GONE
+                    return false
+                }
+            })
+            .into(binding.profileImage)
     }
 
 

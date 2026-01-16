@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.interntask.Fragments.shoping_fragment.SearchFragment"
+        android:name="com.example.interntask.Fragments.shoping_fragment.Top_dealsFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
     <fragment

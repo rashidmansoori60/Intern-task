@@ -14,7 +14,8 @@
         android:theme="@style/Theme.InternTask" >
         <activity
             android:name=".Activity.DashBoardActivity"
-            android:exported="false" />
+            android:exported="false"
+            />
         <activity
             android:name=".Activity.MainActivity"
             android:exported="true" >

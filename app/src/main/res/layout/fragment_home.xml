@@ -10,7 +10,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/orange"
+        android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/orange"
         android:orientation="horizontal"
+        android:gravity="center_horizontal"
         android:layout_marginTop="10dp">
 
   <LinearLayout
@@ -18,9 +26,10 @@
       android:layout_height="40dp"
       android:orientation="horizontal"
       android:padding="10dp"
+
       android:layout_gravity="center_horizontal"
       android:layout_marginStart="15dp"
-      android:background="#2C2C2C"
+      android:background="@drawable/search_back"
       >
 
       <TextView
@@ -49,35 +58,28 @@
             android:layout_marginStart="10dp"
             android:src="@drawable/outline_document_scanner_24"/>
 
-        <ImageView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="13dp"
-            android:src="@drawable/microphone"/>
-
-
-
     </LinearLayout>
 
 
     <com.google.android.material.tabs.TabLayout
+        android:background="@color/orange"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         app:tabTextColor="@color/g_gray500"
-        android:id="@+id/tab_layout"
+        android:id="@+id/tabLayout"
         app:tabIndicatorHeight="0dp"
         app:tabMode="scrollable"
         app:tabRippleColor="@color/white"
         app:tabSelectedTextColor="@color/g_blue_gray200"
         />
+    </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/home_Viewpager"
-        android:background="@color/g_gray500"
+        android:background="@color/white"
         />
 
 
