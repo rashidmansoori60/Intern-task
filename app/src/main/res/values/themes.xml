@@ -1,12 +1,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.InternTask" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <!-- Base application theme -->
+    <style name="Base.Theme.InternTask"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- STATUS BAR COLOR -->
+        <item name="android:statusBarColor">@color/orange</item>
+
+        <!-- YE LINE MANDATORY HAI -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <!-- YE AGAR HAI TO REMOVE KARO -->
+        <!-- <item name="android:windowTranslucentStatus">true</item> -->
+
     </style>
 
-    <style name="Theme.InternTask" parent="Base.Theme.InternTask" />
-
-
+    <style name="Theme.InternTask"
+        parent="Base.Theme.InternTask" />
 
 </resources>

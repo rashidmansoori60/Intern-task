@@ -4,13 +4,14 @@
     android:layout_width="320dp"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
+    app:cardCornerRadius="30dp"
     app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
+        android:background="@color/g_blue100"
         android:padding="10dp">
 
         <!-- 🖼 Product Image -->
@@ -51,36 +52,60 @@
                 android:maxLines="2"
                 android:layout_marginTop="4dp"/>
 
+            <!-- Price Details & Action -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                >
+                android:layout_marginTop="6dp">
 
-            <TextView
-                android:id="@+id/product_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="₹2,499"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#E53935"
-                android:layout_marginTop="6dp"/>
+                <!-- Price Details Vertical Layout -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
+                    <!-- Original Price -->
+                    <TextView
+                        android:id="@+id/product_actual_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹2,999"
+                        android:textSize="12sp"
+                        android:textColor="#888"
+                        />
+
+                    <!-- Discount Percentage -->
+                    <TextView
+                        android:id="@+id/product_discount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="20% OFF"
+                        android:textSize="12sp"
+                        android:textColor="#388E3C"/>
+
+                    <!-- Price After Discount -->
+                    <TextView
+                        android:id="@+id/product_price_after_discount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹2,399"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#E53935"/>
+                </LinearLayout>
+
+                <!-- Add to Cart / Favorite -->
                 <ImageView
                     android:id="@+id/add_to_cart_img"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:textAllCaps="false"
                     android:src="@drawable/outline_favorite_24"
-                    android:layout_marginStart="70dp"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
                     android:backgroundTint="#FF9800"
-                    android:layout_marginTop="8dp"/>
-
-        </LinearLayout>
+                    android:layout_marginStart="16dp"/>
+            </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>

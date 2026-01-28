@@ -9,11 +9,12 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.interntask.Fragments.cetegories_fragment.AccessoriesFragment
-import com.example.interntask.Fragments.cetegories_fragment.FashionFragment
-import com.example.interntask.Fragments.cetegories_fragment.FurnitureFragment
+import com.example.interntask.Fragments.cetegories_fragment.BeautyFragment
+import com.example.interntask.Fragments.cetegories_fragment.Fashion_Fragment
+import com.example.interntask.Fragments.cetegories_fragment.Furniture_Fragment
 import com.example.interntask.Fragments.cetegories_fragment.MainhomeFragment
-import com.example.interntask.Fragments.cetegories_fragment.Mobile_TabletsFragment
+import com.example.interntask.Fragments.cetegories_fragment.accessories_Fragment
+import com.example.interntask.Fragments.cetegories_fragment.mobile_Fragment
 import com.example.interntask.R
 import com.example.interntask.adapters.HomeviewpagerAdapter
 import com.example.interntask.databinding.FragmentHomeBinding
@@ -45,19 +46,35 @@ class  HomeFragment : Fragment() {
 
         tabLayout=binding.tabLayout
 
-        val list=arrayListOf<Fragment>(MainhomeFragment(), AccessoriesFragment(), FurnitureFragment(),
-            Mobile_TabletsFragment(), FashionFragment())
+        val list=arrayListOf<Fragment>(MainhomeFragment(), Fashion_Fragment(), mobile_Fragment(),
+            BeautyFragment(), Furniture_Fragment(), accessories_Fragment())
+
 
         viewpageradapter= HomeviewpagerAdapter(list,childFragmentManager,lifecycle)
         binding.homeViewpager.adapter=viewpageradapter
+        binding.homeViewpager.isUserInputEnabled = false
 
-        createTab(tabLayout,"For you",R.drawable.for_you)
-        createTab(tabLayout,"Fashion",R.drawable.fashion)
+
+        createTab(tabLayout,"Home",R.drawable.homee)
+        createTab(tabLayout,"Fashion",R.drawable.shopping)
         createTab(tabLayout,"Mobiles",R.drawable.mobile)
         createTab(tabLayout,"Beauty",R.drawable.beuty)
         createTab(tabLayout,"Furniture",R.drawable.furniture)
-        createTab(tabLayout,"Home",R.drawable.homee)
         createTab(tabLayout,"Tablets",R.drawable.outline_aod_tablet_24)
+
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.let {
+                    binding.homeViewpager.currentItem = it.position
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+
 
 
     }

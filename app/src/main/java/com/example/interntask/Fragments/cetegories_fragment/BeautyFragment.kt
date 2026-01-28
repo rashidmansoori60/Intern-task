@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.example.interntask.R
 
 
-open class BasehomeFragment : Fragment() {
+ class BeautyFragment : Fragment() {
 
 
     override fun onCreateView(
@@ -16,7 +16,7 @@ open class BasehomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_basehome, container, false)
+        return inflater.inflate(R.layout.fragment_beauty_, container, false)
     }
 
 }
