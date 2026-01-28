@@ -16,6 +16,7 @@ import com.example.interntask.Uistate.Uistate
 import com.example.interntask.adapters.DetailsVpAdapter
 import com.example.interntask.databinding.FragmentMainhomeBinding
 import com.example.interntask.databinding.FragmentProductDetailsBinding
+import com.example.interntask.model.Detailsrvmodel.DetailsAll_itemmodel
 import com.example.interntask.model.MainhomeModel.Product
 import com.example.interntask.viewmodels.BestdealsVm
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -26,6 +27,8 @@ import kotlin.getValue
 class ProductDetailsFragment : Fragment() {
     var _binding: FragmentProductDetailsBinding?=null
     private val binding get() = _binding!!
+
+    lateinit var list: MutableList<DetailsAll_itemmodel>
 
     val bestdealsVm: BestdealsVm by activityViewModels()
 

@@ -90,7 +90,6 @@ class MainhomeFragment : Fragment() {
 
 
         }
-        binding.
 
         adapter= BannerAdapter(mutableListOf())
         binding.bannerimgVp.adapter = adapter

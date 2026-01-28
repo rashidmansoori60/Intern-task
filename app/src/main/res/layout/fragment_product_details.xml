@@ -152,6 +152,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingTop="12dp"
+                    android:layout_gravity="center"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
                     android:paddingBottom="12dp">
@@ -308,20 +309,17 @@
 
                         <TextView
                             android:layout_width="80dp"
-                            android:layout_height="wrap_content"
                             android:text="Stock"
-                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
                             android:textColor="#616161"
                             android:textStyle="bold"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="rashid khan"
                             android:textColor="@color/g_green"
                             android:id="@+id/tvStock"
                             />
-
                     </LinearLayout>
 
 
@@ -338,12 +336,12 @@
                     android:layout_marginTop="10dp"/>
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvSuggestions"
+                    android:id="@+id/Main_rvSuggestions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:overScrollMode="never"
-                    android:scrollbars="horizontal"/>
+                    />
 
 
 
