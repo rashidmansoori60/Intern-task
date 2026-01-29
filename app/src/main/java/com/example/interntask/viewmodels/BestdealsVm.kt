@@ -28,8 +28,17 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     val batchFlow = _batchFlow.asSharedFlow()
 
 
-    private val _detailItem = MutableStateFlow <Uistate<Product>>(Uistate.Loading())
+    private val _detailItem = MutableStateFlow<Uistate<Product>>(Uistate.Loading())
     val detailItem = _detailItem.asStateFlow()
+
+    private val _detailsuggetionA = MutableStateFlow<Uistate<List<Product>>>(Uistate.Loading())
+    val detailsuggetionA = _detailsuggetionA.asStateFlow()
+
+    private val _detailsuggetionB = MutableStateFlow<Uistate<List<Product>>>(Uistate.Loading())
+    val detailsuggetionB = _detailsuggetionB.asStateFlow()
+
+    private val _detailAllGrid = MutableSharedFlow<List<Product>>()
+    val detailAllGrid = _detailAllGrid.asSharedFlow()
 
 
 
@@ -57,7 +66,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
         viewModelScope.launch {
             _bestDeals.emit(Uistate.Loading())
             try {
-                val data=repo.getProduct()
+                val data=repo.getProduct(30,0)
                 if(data.isNotEmpty()){
                     _toastbestdeal.emit("got ${data.size}")
                 _bestDeals.emit(Uistate.Success(data))
@@ -152,6 +161,8 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
                 val item=repo.getproductbyId(id)
                 if(item!=null){
                     _detailItem.emit(Uistate.Success(item))
+                     suggetionAemit(item.category)
+                     detailAllitememit()
                 }
             }catch (e: Exception){
                 _detailItem.emit(Uistate.Error(e.message.toString()))
@@ -160,27 +171,75 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
         }
     }
 
-    fun loadNext20() {
-        if (isLoading) return
-        if (currentIndex >= allitemArraylist.size) return
-
-        isLoading = true
-
-        val nextBatch = allitemArraylist.subList(
-            currentIndex,
-            minOf(currentIndex + pageSize, allitemArraylist.size)
-        ).toList()
-
-        currentIndex += pageSize
-
+    fun suggetionAemit(cetegory:String){
         viewModelScope.launch {
+            _detailsuggetionA.emit(Uistate.Loading())
+            _detailsuggetionB.emit(Uistate.Loading())
+
             try {
-                _batchFlow.emit(nextBatch)
-                _toastbestdeal.emit("$currentIndex - $currentIndex+$pageSize")
-            } finally {
-                isLoading = false
+                val result=repo.getdetailsuggetion(cetegory)
+                val result2=repo.getProduct(30,30)
+                if(result2!=null){
+                    _detailsuggetionB.emit(Uistate.Success(result2))
+                }else{
+                    _detailsuggetionB.emit(Uistate.Success(emptyList()))
+                }
+
+
+                if(result!=null){
+                    _detailsuggetionA.emit(Uistate.Success(result))
+                }
+                else{
+                    _detailsuggetionA.emit(Uistate.Success(repo.getProduct(30,60)))
+                }
+
+            }catch (e: Exception)
+            {
+                _detailsuggetionA.emit(Uistate.Error(e.message.toString()))
+                _detailsuggetionB.emit(Uistate.Error(e.message.toString()))
+
             }
         }
     }
+
+
+    fun detailAllitememit(){
+
+        viewModelScope.launch {
+            val result=repo.getAllgrid()
+            if(result.isNotEmpty()){
+                _detailAllGrid.emit(result)
+            }
+            else{
+                _detailAllGrid.emit(emptyList())
+            }
+
+        }
+    }
+
+
+
+//    fun loadNext20() {
+//        if (isLoading) return
+//        if (currentIndex >= allitemArraylist.size) return
+//
+//        isLoading = true
+//
+//        val nextBatch = allitemArraylist.subList(
+//            currentIndex,
+//            minOf(currentIndex + pageSize, allitemArraylist.size)
+//        ).toList()
+//
+//        currentIndex += pageSize
+//
+//        viewModelScope.launch {
+//            try {
+//                _batchFlow.emit(nextBatch)
+//                _toastbestdeal.emit("$currentIndex - $currentIndex+$pageSize")
+//            } finally {
+//                isLoading = false
+//            }
+//        }
+//   }
 
 }

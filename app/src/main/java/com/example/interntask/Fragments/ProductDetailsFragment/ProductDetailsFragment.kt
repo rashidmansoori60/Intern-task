@@ -10,9 +10,12 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.interntask.R
 import com.example.interntask.Uistate.Uistate
+import com.example.interntask.adapters.Details.DetailSuggetionAdapter
 import com.example.interntask.adapters.DetailsVpAdapter
 import com.example.interntask.databinding.FragmentMainhomeBinding
 import com.example.interntask.databinding.FragmentProductDetailsBinding
@@ -29,8 +32,10 @@ class ProductDetailsFragment : Fragment() {
     private val binding get() = _binding!!
 
     lateinit var list: MutableList<DetailsAll_itemmodel>
-
+    var mutableList=mutableListOf<DetailsAll_itemmodel>()
     val bestdealsVm: BestdealsVm by activityViewModels()
+
+   lateinit var detailSuggetionAdapter: DetailSuggetionAdapter
 
     lateinit var vpAdapter: DetailsVpAdapter
 
@@ -45,11 +50,75 @@ class ProductDetailsFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
          vpAdapter= DetailsVpAdapter(emptyList())
 
          binding.viewPagerProductImages.adapter=vpAdapter
 
+
+
+        detailSuggetionAdapter= DetailSuggetionAdapter(emptyList())
+        binding.MainRvSuggestions.adapter=detailSuggetionAdapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+              launch {
+            bestdealsVm.detailsuggetionA.collect { it ->
+                when(it) {
+                    is Uistate.Loading -> {}
+
+                    is Uistate.Success -> {
+                        mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
+                    }
+
+                    is Uistate.Error -> {}
+
+
+                }
+            }}
+                  launch {
+                      bestdealsVm.detailsuggetionB.collect { it ->
+                          when(it){
+                          is Uistate.Loading -> {
+
+                      }
+
+                          is Uistate.Success -> {
+                              mutableList.add(DetailsAll_itemmodel.SuggetionB(it.data))
+                          }
+
+                          is Uistate.Error -> {
+
+                          }
+
+        }  }
+                  }
+
+                launch {
+                    bestdealsVm.detailAllGrid.collect { it ->
+                     mutableList.add(DetailsAll_itemmodel.Allproduct(it))
+                    }
+                }
+                launch {
+                    bestdealsVm.allGriditem.collect { it->
+                        when(it){
+                            is Uistate.Loading -> {
+
+                            }
+
+                            is Uistate.Success -> {
+                                mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
+                            }
+
+                            is Uistate.Error -> {
+
+                            }
+
+                        }
+                    }
+                }
+
+            }
 
         viewLifecycleOwner.lifecycleScope.launch {
             bestdealsVm.detailItem.collect { it ->
@@ -72,10 +141,12 @@ class ProductDetailsFragment : Fragment() {
 
         }
 
-    }
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun bindProduct(product: Product) = with(binding) {
+
+
 
         // ---------- BASIC INFO ----------
         tvTitle.text = product.title

@@ -15,6 +15,13 @@ import com.example.interntask.model.MainhomeModel.Product
 
 class DetailSuggetionAdapter(var list: List<DetailsAll_itemmodel>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+
+    fun update(list: List<DetailsAll_itemmodel>){
+        this.list=list
+        notifyDataSetChanged()
+    }
+
+
     override fun getItemViewType(position: Int): Int {
         return when (list[position]) {
             is DetailsAll_itemmodel.SuggetionA -> 0

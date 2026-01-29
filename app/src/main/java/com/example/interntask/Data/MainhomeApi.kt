@@ -9,8 +9,15 @@ import retrofit2.http.Query
 
 interface MainhomeApi{
 
-    @GET("product")
-    suspend fun getproducts(): retrofit2.Response<ProductResponse>
+
+
+        @GET("products")
+        suspend fun getProducts(
+            @Query("limit") limit: Int,
+            @Query("skip") skip: Int
+        ):retrofit2.Response<ProductResponse>
+
+
 
     @GET("products/category/{category}")
     suspend fun getProductsByCategory(
@@ -21,7 +28,14 @@ interface MainhomeApi{
     @GET("products/category/{category}")
     suspend fun getProductsCategorygrid(
         @Path("category") category: String,
-        @Query("limit") limit: Int = 10
+        @Query("limit") limit: Int = 20
+    ):retrofit2.Response<ProductResponse>
+
+
+
+    @GET("products/category/{category}")
+    suspend fun getProductsCategory_detailsuggetion(
+        @Path("category") category: String
     ):retrofit2.Response<ProductResponse>
 
 

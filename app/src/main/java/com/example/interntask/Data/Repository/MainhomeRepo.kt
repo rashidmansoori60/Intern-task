@@ -39,10 +39,10 @@ class MainhomeRepo @Inject constructor(val api: MainhomeApi) {
         "womens-shoes",
         "womens-watches")
 
-    suspend fun getProduct(): List<Product>{
-        val response=api.getproducts()
+    suspend fun getProduct(limit:Int,skip: Int): List<Product>{
+        val response=api.getProducts(limit,skip)
         if(response.isSuccessful&&response.body()!=null){
-        return response.body()!!.products.sortedByDescending { it.discountPercentage }.take(30)
+        return response.body()!!.products
         }
         return emptyList()
     }
@@ -74,6 +74,10 @@ class MainhomeRepo @Inject constructor(val api: MainhomeApi) {
             Log.e("HomeRepo", "Failed category: $category", e)
             emptyList()
         }
+    }
+
+    suspend fun getdetailsuggetion(cetegory:String): List<Product>{
+       return api.getProductsCategory_detailsuggetion(cetegory).body()!!.products
     }
 
     suspend fun getproductbyId(id: Int): Product?{
