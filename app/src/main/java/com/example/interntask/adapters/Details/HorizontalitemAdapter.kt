@@ -9,7 +9,7 @@ import com.example.interntask.databinding.GridItemBinding
 import com.example.interntask.model.Detailsrvmodel.Horizontal_Gridmodel
 import com.example.interntask.model.MainhomeModel.Product
 
-class HorizontalitemAdapter(var list: MutableList<Product>): RecyclerView.Adapter<HorizontalitemAdapter.Horizontalvh>() {
+class HorizontalitemAdapter(var list: MutableList<Product>,val onclick:(Int)-> Unit): RecyclerView.Adapter<HorizontalitemAdapter.Horizontalvh>() {
 
 
     fun setInitialData(newList: List<Product>) {
@@ -42,6 +42,10 @@ class HorizontalitemAdapter(var list: MutableList<Product>): RecyclerView.Adapte
         holder.binding.productActualPrice.text=result.price.toIntValue().toINR()
         holder.binding.productPriceAfterDiscount.text=result.afterDiscountPrice.toIntValue().toINR()
 
+
+        holder.itemView.setOnClickListener {
+            onclick(result.id)
+        }
     }
 
 

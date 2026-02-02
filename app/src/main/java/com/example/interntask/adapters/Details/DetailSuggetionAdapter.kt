@@ -14,7 +14,7 @@ import com.example.interntask.model.Detailsrvmodel.Horizontal_Gridmodel
 import com.example.interntask.model.MainhomeModel.Product
 import dagger.hilt.android.internal.Contexts
 
-class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loadmore:()-> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loadmore:()-> Unit,val onclick: (Int)-> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var vh:SuggertionAllvh?=null
 
@@ -39,12 +39,12 @@ class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loa
       return when(viewType){
              0->{
                val view= DetailItemSuggetiononeBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-                    SuggertionAvh(view)
+                    SuggertionAvh(view,onclick)
 
             }
              1->{
               val view= DetailsItemsuggetionTwoBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-                  SuggertionBvh(view)
+                  SuggertionBvh(view, onclick)
 
              }
 
@@ -60,6 +60,7 @@ class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loa
         holder: RecyclerView.ViewHolder,
         position: Int
     ) {
+
            when(val result=list[position]){
 
                is DetailsAll_itemmodel.SuggetionA -> {
@@ -82,9 +83,13 @@ class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loa
         return list.size
     }
 
-    class SuggertionAvh(val binding: DetailItemSuggetiononeBinding): RecyclerView.ViewHolder(binding.root){
+    class SuggertionAvh(val binding: DetailItemSuggetiononeBinding,val onclick: (Int)-> Unit ): RecyclerView.ViewHolder(binding.root){
         val rv = binding.suggetionRecycler
-        val adapterA= HorizontalitemAdapter(mutableListOf())
+        val adapterA= HorizontalitemAdapter(mutableListOf()){it->
+            onclick(it)
+        }
+
+
 
         init {
             rv.apply {
@@ -99,9 +104,11 @@ class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loa
         }
     }
 
-    class SuggertionBvh(val binding: DetailsItemsuggetionTwoBinding): RecyclerView.ViewHolder(binding.root){
+    class SuggertionBvh(val binding: DetailsItemsuggetionTwoBinding,val onclick: (Int)-> Unit): RecyclerView.ViewHolder(binding.root){
         val rv = binding.suggetionRecycler2
-        val adapterB = HorizontalitemAdapter(mutableListOf())
+        val adapterB = HorizontalitemAdapter(mutableListOf()){it->
+            onclick(it)
+        }
 
         init {
             rv.apply {
@@ -118,11 +125,14 @@ class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loa
 
     class SuggertionAllvh(val binding: DetailsAllGridBinding,val onLoadMore: () -> Unit): RecyclerView.ViewHolder(binding.root){
         val rv = binding.detailsAllgridrecycler
+
         private var isLoading = false
         val lm=GridLayoutManager(itemView.context, 2)
         val adapterrv = GridAdapter(mutableListOf())
 
         init {
+
+
             rv.apply {
                     adapter = adapterrv
                     layoutManager=lm

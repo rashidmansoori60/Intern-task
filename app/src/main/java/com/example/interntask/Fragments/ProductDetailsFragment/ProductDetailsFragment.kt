@@ -12,9 +12,11 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.interntask.R
 import com.example.interntask.Uistate.Uistate
@@ -67,11 +69,23 @@ class ProductDetailsFragment : Fragment() {
 
 
 
-        detailSuggetionAdapter = DetailSuggetionAdapter(mutableListOf()){
-                  viewLifecycleOwner.lifecycleScope.launch {
+        detailSuggetionAdapter = DetailSuggetionAdapter(mutableListOf(),
+            loadmore = {
+                viewLifecycleOwner.lifecycleScope.launch {
                       bestdealsVm.detailAllitememitshared()
-                  }
-        }
+                 }
+            },
+            onclick = {it->
+                bestdealsVm.getbyId(it)
+                requireActivity()
+                    .findNavController(R.id.nav_host)
+                    .navigate(R.id.productDetailsFragment)
+            })
+
+
+
+
+
         binding.MainRvSuggestions.layoutManager= LinearLayoutManager(requireContext())
 
         binding.MainRvSuggestions.adapter = detailSuggetionAdapter
@@ -260,6 +274,7 @@ class ProductDetailsFragment : Fragment() {
 
         override fun onDestroyView() {
             super.onDestroyView()
+            _binding = null
             Log.e("productdetails","onDestroyview")
             requireActivity()
                 .findViewById<BottomNavigationView>(R.id.bottom_navigation)
@@ -271,7 +286,10 @@ class ProductDetailsFragment : Fragment() {
         Log.e("productdetails","onDestroy")
     }
 
-
+    override fun onDetach() {
+        super.onDetach()
+        Log.e("productdetails","onDestroy")
+    }
     private fun refreshAdapter() {
         val finalList = mutableListOf<DetailsAll_itemmodel>()
 

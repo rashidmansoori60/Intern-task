@@ -157,16 +157,18 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
 
     fun getbyId(id: Int){
         viewModelScope.launch {
+            _toastbestdeal.emit("item getting start")
             _detailItem.emit(Uistate.Loading())
             try {
                 val item=repo.getproductbyId(id)
                 if(item!=null){
+                    _toastbestdeal.emit("item gated")
                     _detailItem.emit(Uistate.Success(item))
-                    delay(2000)
                      suggetionAemit(item.category)
 
                 }
             }catch (e: Exception){
+                _toastbestdeal.emit("item problem :"+e.message.toString())
                 _detailItem.emit(Uistate.Error(e.message.toString()))
             }
 
