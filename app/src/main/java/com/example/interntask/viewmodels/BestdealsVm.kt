@@ -8,6 +8,7 @@ import com.example.interntask.Uistate.Uistate
 import com.example.interntask.model.MainhomeModel.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,8 +38,8 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     private val _detailsuggetionB = MutableStateFlow<Uistate<List<Product>>>(Uistate.Loading())
     val detailsuggetionB = _detailsuggetionB.asStateFlow()
 
-    private val _detailAllGrid = MutableSharedFlow<List<Product>>()
-    val detailAllGrid = _detailAllGrid.asSharedFlow()
+    private val _detailAllGridshared = MutableSharedFlow<List<Product>>()
+    val detailAllGridshared = _detailAllGridshared.asSharedFlow()
 
 
 
@@ -161,8 +162,9 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
                 val item=repo.getproductbyId(id)
                 if(item!=null){
                     _detailItem.emit(Uistate.Success(item))
+                    delay(2000)
                      suggetionAemit(item.category)
-                     detailAllitememit()
+
                 }
             }catch (e: Exception){
                 _detailItem.emit(Uistate.Error(e.message.toString()))
@@ -203,15 +205,15 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     }
 
 
-    fun detailAllitememit(){
+    fun detailAllitememitshared(){
 
         viewModelScope.launch {
             val result=repo.getAllgrid()
             if(result.isNotEmpty()){
-                _detailAllGrid.emit(result)
+                _detailAllGridshared.emit(result)
             }
             else{
-                _detailAllGrid.emit(emptyList())
+                _detailAllGridshared.emit(emptyList())
             }
 
         }

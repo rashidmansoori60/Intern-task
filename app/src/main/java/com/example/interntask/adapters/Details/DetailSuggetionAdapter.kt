@@ -12,25 +12,24 @@ import com.example.interntask.databinding.DetailsItemsuggetionTwoBinding
 import com.example.interntask.model.Detailsrvmodel.DetailsAll_itemmodel
 import com.example.interntask.model.Detailsrvmodel.Horizontal_Gridmodel
 import com.example.interntask.model.MainhomeModel.Product
+import dagger.hilt.android.internal.Contexts
 
-class DetailSuggetionAdapter(var list: List<DetailsAll_itemmodel>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loadmore:()-> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    var vh:SuggertionAllvh?=null
 
-    fun update(list: List<DetailsAll_itemmodel>){
+    fun update(list: MutableList<DetailsAll_itemmodel>){
         this.list=list
         notifyDataSetChanged()
     }
-
-
     override fun getItemViewType(position: Int): Int {
         return when (list[position]) {
             is DetailsAll_itemmodel.SuggetionA -> 0
             is DetailsAll_itemmodel.SuggetionB -> 1
             is DetailsAll_itemmodel.Allproduct -> 2
         }
+
     }
-
-
 
 
     override fun onCreateViewHolder(
@@ -51,7 +50,7 @@ class DetailSuggetionAdapter(var list: List<DetailsAll_itemmodel>): RecyclerView
 
           else -> {
               val view = DetailsAllGridBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-                SuggertionAllvh(view)
+                SuggertionAllvh(view, loadmore )
           }
       }
 
@@ -70,7 +69,9 @@ class DetailSuggetionAdapter(var list: List<DetailsAll_itemmodel>): RecyclerView
                    (holder as SuggertionBvh).bind(result.list)
                }
                is DetailsAll_itemmodel.Allproduct -> {
-                   (holder as SuggertionAllvh).bind(result.list)
+                   val vhh=holder as SuggertionAllvh
+                   vh=vhh
+                   vhh.bind(result.list)
                }
 
            }
@@ -82,34 +83,75 @@ class DetailSuggetionAdapter(var list: List<DetailsAll_itemmodel>): RecyclerView
     }
 
     class SuggertionAvh(val binding: DetailItemSuggetiononeBinding): RecyclerView.ViewHolder(binding.root){
+        val rv = binding.suggetionRecycler
+        val adapterA= HorizontalitemAdapter(mutableListOf())
+
+        init {
+            rv.apply {
+                layoutManager =
+                    LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
+                adapter =adapterA
+                isNestedScrollingEnabled = false
+            }
+        }
         fun bind(list: List<Product>) {
-            val rv = binding.suggetionRecycler
-            rv.layoutManager =
-                LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
-            rv.adapter = HorizontalitemAdapter(list)
-            rv.isNestedScrollingEnabled = false
+            adapterA.setInitialData(list)
         }
     }
 
     class SuggertionBvh(val binding: DetailsItemsuggetionTwoBinding): RecyclerView.ViewHolder(binding.root){
+        val rv = binding.suggetionRecycler2
+        val adapterB = HorizontalitemAdapter(mutableListOf())
+
+        init {
+            rv.apply {
+                layoutManager =
+                    LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
+                adapter =adapterB
+                isNestedScrollingEnabled = false
+            }
+        }
         fun bind(list: List<Product>) {
-            val rv = binding.suggetionRecycler2
-            rv.layoutManager =
-                LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
-            rv.adapter = HorizontalitemAdapter(list)
-            rv.isNestedScrollingEnabled = false
+            adapterB.setInitialData(list)
         }
     }
 
-    class SuggertionAllvh(val binding: DetailsAllGridBinding): RecyclerView.ViewHolder(binding.root){
+    class SuggertionAllvh(val binding: DetailsAllGridBinding,val onLoadMore: () -> Unit): RecyclerView.ViewHolder(binding.root){
+        val rv = binding.detailsAllgridrecycler
+        private var isLoading = false
+        val lm=GridLayoutManager(itemView.context, 2)
+        val adapterrv = GridAdapter(mutableListOf())
+
+        init {
+            rv.apply {
+                    adapter = adapterrv
+                    layoutManager=lm
+                    isNestedScrollingEnabled = false
 
 
-        fun bind(list: List<Product>) {
-            val rv = binding.detailsAllgridrecycler
-            rv.layoutManager =
-                GridLayoutManager(itemView.context,2)
-            rv.adapter = GridAdapter(list)
-            rv.isNestedScrollingEnabled = false
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                        val visible = lm.childCount
+                        val total = lm.itemCount
+                        val first = lm.findFirstVisibleItemPosition()
+
+                        if (!isLoading && visible + first >= total - 2) {
+                            isLoading = true
+                            onLoadMore()
+                        }
+                    }
+                })
+            }
         }
+        fun bind(list: List<Product>) {
+           adapterrv.setInitialData(list)
+        }
+        fun addMore(list: List<Product>) {
+            adapterrv.addMoreItems(list)
+            isLoading = false
+        }
+    }
+    fun addmoreGriditem(list: List<Product>){
+       vh?.addMore(list)
     }
 }

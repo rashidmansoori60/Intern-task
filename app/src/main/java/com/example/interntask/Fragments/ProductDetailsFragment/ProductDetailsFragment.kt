@@ -3,16 +3,19 @@ package com.example.interntask.Fragments.ProductDetailsFragment
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.interntask.R
 import com.example.interntask.Uistate.Uistate
 import com.example.interntask.adapters.Details.DetailSuggetionAdapter
@@ -24,6 +27,7 @@ import com.example.interntask.model.MainhomeModel.Product
 import com.example.interntask.viewmodels.BestdealsVm
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.getValue
 @AndroidEntryPoint
@@ -32,8 +36,13 @@ class ProductDetailsFragment : Fragment() {
     private val binding get() = _binding!!
 
     lateinit var list: MutableList<DetailsAll_itemmodel>
-    var mutableList=mutableListOf<DetailsAll_itemmodel>()
+    private val mutableList=mutableListOf<DetailsAll_itemmodel>()
+
+
+
     val bestdealsVm: BestdealsVm by activityViewModels()
+
+    // val secrtion=mutableListOf<DetailsAll_itemmodel>()
 
    lateinit var detailSuggetionAdapter: DetailSuggetionAdapter
 
@@ -50,64 +59,104 @@ class ProductDetailsFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-         vpAdapter= DetailsVpAdapter(emptyList())
+        Log.e("productdetails","onviewcreted")
 
-         binding.viewPagerProductImages.adapter=vpAdapter
+        vpAdapter = DetailsVpAdapter(emptyList())
+
+        binding.viewPagerProductImages.adapter = vpAdapter
 
 
 
-        detailSuggetionAdapter= DetailSuggetionAdapter(emptyList())
-        binding.MainRvSuggestions.adapter=detailSuggetionAdapter
+        detailSuggetionAdapter = DetailSuggetionAdapter(mutableListOf()){
+                  viewLifecycleOwner.lifecycleScope.launch {
+                      bestdealsVm.detailAllitememitshared()
+                  }
+        }
+        binding.MainRvSuggestions.layoutManager= LinearLayoutManager(requireContext())
+
+        binding.MainRvSuggestions.adapter = detailSuggetionAdapter
+
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            bestdealsVm.detailAllGridshared.collect { it->
+                detailSuggetionAdapter.addmoreGriditem(it)
+             }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                launch {
+                    bestdealsVm.detailItem.collect { it ->
+                        when (it) {
+                            is Uistate.Error -> {
+                                binding.detailsprogress.visibility = View.GONE
+
+                            }
+
+                            is Uistate.Loading -> {
+                                binding.detailsprogress.visibility = View.VISIBLE
+                            }
+
+                            is Uistate.Success -> {
+                                bindProduct(it.data)
+                                binding.detailsprogress.visibility = View.GONE
+
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-              launch {
-            bestdealsVm.detailsuggetionA.collect { it ->
-                when(it) {
-                    is Uistate.Loading -> {}
-
-                    is Uistate.Success -> {
-                        mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
-                    }
-
-                    is Uistate.Error -> {}
-
-
-                }
-            }}
-                  launch {
-                      bestdealsVm.detailsuggetionB.collect { it ->
-                          when(it){
-                          is Uistate.Loading -> {
-
-                      }
-
-                          is Uistate.Success -> {
-                              mutableList.add(DetailsAll_itemmodel.SuggetionB(it.data))
-                          }
-
-                          is Uistate.Error -> {
-
-                          }
-
-        }  }
-                  }
-
                 launch {
-                    bestdealsVm.detailAllGrid.collect { it ->
-                     mutableList.add(DetailsAll_itemmodel.Allproduct(it))
+                    bestdealsVm.detailsuggetionA.collect { it ->
+                        when (it) {
+                            is Uistate.Loading -> {}
+
+                            is Uistate.Success -> {
+                                Toast.makeText(requireContext(),it.data.size.toString()+"A", Toast.LENGTH_LONG).show()
+                                mutableList.removeAll{it is DetailsAll_itemmodel.SuggetionA}
+                                mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
+                                refreshAdapter()
+                               // detailSuggetionAdapter.update(DetailsAll_itemmodel.SuggetionA(it.data))
+
+//                                if (mutableList.none { it is DetailsAll_itemmodel.SuggetionA }) {
+////                                    mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
+////                                    detailSuggetionAdapter.update(mutableList.toList())
+//                                }
+                            }
+
+                            is Uistate.Error -> {}
+
+
+                        }
                     }
                 }
                 launch {
-                    bestdealsVm.allGriditem.collect { it->
-                        when(it){
+                    bestdealsVm.detailsuggetionB.collect { it ->
+                        when (it) {
                             is Uistate.Loading -> {
 
                             }
 
                             is Uistate.Success -> {
-                                mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
+                                Toast.makeText(requireContext(),it.data.size.toString()+"B", Toast.LENGTH_LONG).show()
+                                mutableList.removeAll{it is DetailsAll_itemmodel.SuggetionB}
+                                mutableList.add(DetailsAll_itemmodel.SuggetionB (it.data))
+                                refreshAdapter()
+                               // detailSuggetionAdapter.update(DetailsAll_itemmodel.SuggetionB(it.data))
+//                                if (mutableList.none { it is DetailsAll_itemmodel.SuggetionB }) {
+//
+//
+////                                    mutableList.add(DetailsAll_itemmodel.SuggetionB(it.data))
+////                                    detailSuggetionAdapter.update(mutableList.toList())
+//                                }
                             }
 
                             is Uistate.Error -> {
@@ -116,92 +165,131 @@ class ProductDetailsFragment : Fragment() {
 
                         }
                     }
+
+                }
+                launch {
+                    bestdealsVm.allGriditem.collect { it ->
+                        when (it) {
+                            is Uistate.Loading -> {
+
+                            }
+
+                            is Uistate.Success -> {
+                                Toast.makeText(requireContext(),it.data.size.toString()+"Allll", Toast.LENGTH_LONG).show()
+
+                                mutableList.removeAll{it is DetailsAll_itemmodel.Allproduct}
+                                mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
+                                refreshAdapter()
+//                                if (mutableList.none { it is DetailsAll_itemmodel.Allproduct }) {
+//                                    detailSuggetionAdapter.update(DetailsAll_itemmodel.Allproduct(it.data))
+////                                    mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
+////                                    detailSuggetionAdapter.update(mutableList.toList())
+//                                }
+
+                            }
+
+                            is Uistate.Error -> {
+
+                            }
+
+                        }
+                    }
+
                 }
 
             }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            bestdealsVm.detailItem.collect { it ->
-                when(it){
-                    is Uistate.Error ->{
-                        binding.detailsprogress.visibility=View.GONE
 
-                    }
 
-                    is Uistate.Loading -> {
-                        binding.detailsprogress.visibility=View.VISIBLE
-                    }
+        }}
 
-                    is Uistate.Success ->{
-                        bindProduct(it.data)
-                        binding.detailsprogress.visibility=View.GONE
-                    }
+            @RequiresApi(Build.VERSION_CODES.M)
+            private fun bindProduct(product: Product) = with(binding) {
+
+
+                // ---------- BASIC INFO ----------
+                tvTitle.text = product.title
+                tvDescription.text = product.description
+
+                // ---------- RATING ----------
+                tvRating.text = String.format("%.1f", product.rating)
+                tvReviewCount.text = "(${product.reviews.size})"
+
+                // ---------- PRICE CALCULATION ----------
+                val discountedPrice =
+                    product.price - (product.price * product.discountPercentage / 100)
+
+                tvDiscountPercent.text = "${product.discountPercentage.toInt()}%"
+                tvOriginalPrice.text = "₹${product.price}"
+                tvDiscountedPrice.text = "₹${String.format("%.2f", discountedPrice)}"
+
+                // ---------- STOCK / AVAILABILITY ----------
+                if (product.availabilityStatus.equals("In Stock", true) && product.stock > 0) {
+                    tvStock.text = "In stock"
+                    tvStock.setTextColor(requireContext().getColor(R.color.g_green))
+                } else {
+                    tvStock.text = "Out of stock"
+                    tvStock.setTextColor(Color.RED)
                 }
+
+                // ---------- PRODUCT DETAILS ----------
+                tvBrand.text = product.brand ?: "N/A"
+                tvSku.text = product.sku
+                tvWeight.text = "${product.weight} g"
+
+                tvDimensions.text =
+                    "${product.dimensions.width} × ${product.dimensions.height} × ${product.dimensions.depth} cm"
+
+                tvWarranty.text = product.warrantyInformation
+                tvShipping.text = product.shippingInformation
+
+                // ---------- VIEWPAGER IMAGES ----------
+
+                vpAdapter.submitList(product.images)
+
             }
 
+
+        override fun onResume() {
+            super.onResume()
+            Log.e("productdetails","onresume")
+            requireActivity()
+                .findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                .isVisible = false
         }
 
-
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun bindProduct(product: Product) = with(binding) {
-
-
-
-        // ---------- BASIC INFO ----------
-        tvTitle.text = product.title
-        tvDescription.text = product.description
-
-        // ---------- RATING ----------
-        tvRating.text = String.format("%.1f", product.rating)
-        tvReviewCount.text = "(${product.reviews.size})"
-
-        // ---------- PRICE CALCULATION ----------
-        val discountedPrice =
-            product.price - (product.price * product.discountPercentage / 100)
-
-        tvDiscountPercent.text = "${product.discountPercentage.toInt()}%"
-        tvOriginalPrice.text = "₹${product.price}"
-        tvDiscountedPrice.text = "₹${String.format("%.2f", discountedPrice)}"
-
-        // ---------- STOCK / AVAILABILITY ----------
-        if (product.availabilityStatus.equals("In Stock", true) && product.stock > 0) {
-            tvStock.text = "In stock"
-            tvStock.setTextColor(requireContext().getColor(R.color.g_green))
-        } else {
-            tvStock.text = "Out of stock"
-            tvStock.setTextColor(Color.RED)
+        override fun onDestroyView() {
+            super.onDestroyView()
+            Log.e("productdetails","onDestroyview")
+            requireActivity()
+                .findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                .isVisible = true
         }
 
-        // ---------- PRODUCT DETAILS ----------
-        tvBrand.text = product.brand ?: "N/A"
-        tvSku.text = product.sku
-        tvWeight.text = "${product.weight} g"
-
-        tvDimensions.text =
-            "${product.dimensions.width} × ${product.dimensions.height} × ${product.dimensions.depth} cm"
-
-        tvWarranty.text = product.warrantyInformation
-        tvShipping.text = product.shippingInformation
-
-        // ---------- VIEWPAGER IMAGES ----------
-
-        vpAdapter.submitList(product.images)
-
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e("productdetails","onDestroy")
     }
 
-    override fun onResume() {
-        super.onResume()
-        requireActivity()
-            .findViewById<BottomNavigationView>(R.id.bottom_navigation)
-            .isVisible = false
+
+    private fun refreshAdapter() {
+        val finalList = mutableListOf<DetailsAll_itemmodel>()
+
+        mutableList.find { it is DetailsAll_itemmodel.SuggetionA }?.let {
+            finalList.add(it)
+        }
+
+        mutableList.find { it is DetailsAll_itemmodel.SuggetionB }?.let {
+            finalList.add(it)
+
+        }
+
+        mutableList.find { it is DetailsAll_itemmodel.Allproduct }?.let {
+            finalList.add(it)
+
+        }
+       detailSuggetionAdapter.update(finalList)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        requireActivity()
-            .findViewById<BottomNavigationView>(R.id.bottom_navigation)
-            .isVisible = true
-    }
 
 }

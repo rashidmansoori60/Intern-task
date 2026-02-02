@@ -9,8 +9,20 @@ import com.example.interntask.databinding.GridItemBinding
 import com.example.interntask.model.Detailsrvmodel.Horizontal_Gridmodel
 import com.example.interntask.model.MainhomeModel.Product
 
-class HorizontalitemAdapter(var list: List<Product>): RecyclerView.Adapter<HorizontalitemAdapter.Horizontalvh>() {
+class HorizontalitemAdapter(var list: MutableList<Product>): RecyclerView.Adapter<HorizontalitemAdapter.Horizontalvh>() {
 
+
+    fun setInitialData(newList: List<Product>) {
+        list.clear()
+        list.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    fun addMoreItems(newList: List<Product>) {
+        val start = list.size
+        list.addAll(newList)
+        notifyItemRangeInserted(start, newList.size)
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

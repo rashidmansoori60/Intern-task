@@ -10,7 +10,19 @@ import com.example.interntask.databinding.GridItemBinding
 import com.example.interntask.databinding.ProductItemBinding
 import com.example.interntask.model.MainhomeModel.Product
 
-class GridAdapter(var list: List<Product>): RecyclerView.Adapter<GridAdapter.Gridvh>() {
+class GridAdapter(var list: MutableList<Product>): RecyclerView.Adapter<GridAdapter.Gridvh>() {
+
+    fun setInitialData(newList: List<Product>) {
+        list.clear()
+        list.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    fun addMoreItems(newList: List<Product>) {
+        val start = list.size
+        list.addAll(newList)
+        notifyItemRangeInserted(start, newList.size)
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
