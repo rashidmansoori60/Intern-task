@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -17,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.interntask.R
 import com.example.interntask.Uistate.Uistate
@@ -29,6 +31,7 @@ import com.example.interntask.model.MainhomeModel.Product
 import com.example.interntask.viewmodels.BestdealsVm
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.getValue
@@ -58,10 +61,26 @@ class ProductDetailsFragment : Fragment() {
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.e("productdetails","onviewcreted")
+
+
+        requireActivity()
+            .onBackPressedDispatcher
+            .addCallback(viewLifecycleOwner) {
+
+                // agar stack me previous item hai
+                if (bestdealsVm.itemstack.size > 1) {
+                        bestdealsVm.popitemstack()
+                //    findNavController().popBackStack()
+                }
+                else if(bestdealsVm.itemstack.size==1) {
+                    bestdealsVm.popitemstack()
+                    findNavController().popBackStack()
+                }
+            }
 
         vpAdapter = DetailsVpAdapter(emptyList())
 
@@ -77,9 +96,9 @@ class ProductDetailsFragment : Fragment() {
             },
             onclick = {it->
                 bestdealsVm.getbyId(it)
-                requireActivity()
-                    .findNavController(R.id.nav_host)
-                    .navigate(R.id.productDetailsFragment)
+//                requireActivity()
+//                    .findNavController(R.id.nav_host)
+//                    .navigate(R.id.productDetailsFragment)
             })
 
 
@@ -112,9 +131,8 @@ class ProductDetailsFragment : Fragment() {
                             }
 
                             is Uistate.Success -> {
-                                bindProduct(it.data)
                                 binding.detailsprogress.visibility = View.GONE
-
+                                animateProductChange { bindProduct(it.data) }
                             }
                         }
                     }
@@ -137,7 +155,7 @@ class ProductDetailsFragment : Fragment() {
                                 Toast.makeText(requireContext(),it.data.size.toString()+"A", Toast.LENGTH_LONG).show()
                                 mutableList.removeAll{it is DetailsAll_itemmodel.SuggetionA}
                                 mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
-                                refreshAdapter()
+                                refreshAdapterDebounced()
                                // detailSuggetionAdapter.update(DetailsAll_itemmodel.SuggetionA(it.data))
 
 //                                if (mutableList.none { it is DetailsAll_itemmodel.SuggetionA }) {
@@ -163,7 +181,7 @@ class ProductDetailsFragment : Fragment() {
                                 Toast.makeText(requireContext(),it.data.size.toString()+"B", Toast.LENGTH_LONG).show()
                                 mutableList.removeAll{it is DetailsAll_itemmodel.SuggetionB}
                                 mutableList.add(DetailsAll_itemmodel.SuggetionB (it.data))
-                                refreshAdapter()
+                                refreshAdapterDebounced()
                                // detailSuggetionAdapter.update(DetailsAll_itemmodel.SuggetionB(it.data))
 //                                if (mutableList.none { it is DetailsAll_itemmodel.SuggetionB }) {
 //
@@ -193,7 +211,7 @@ class ProductDetailsFragment : Fragment() {
 
                                 mutableList.removeAll{it is DetailsAll_itemmodel.Allproduct}
                                 mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
-                                refreshAdapter()
+                                refreshAdapterDebounced()
 //                                if (mutableList.none { it is DetailsAll_itemmodel.Allproduct }) {
 //                                    detailSuggetionAdapter.update(DetailsAll_itemmodel.Allproduct(it.data))
 ////                                    mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
@@ -220,6 +238,7 @@ class ProductDetailsFragment : Fragment() {
             @RequiresApi(Build.VERSION_CODES.M)
             private fun bindProduct(product: Product) = with(binding) {
 
+                binding.scrollView.scrollTo(0, 0)
 
                 // ---------- BASIC INFO ----------
                 tvTitle.text = product.title
@@ -281,6 +300,8 @@ class ProductDetailsFragment : Fragment() {
                 .isVisible = true
         }
 
+
+
     override fun onDestroy() {
         super.onDestroy()
         Log.e("productdetails","onDestroy")
@@ -308,6 +329,63 @@ class ProductDetailsFragment : Fragment() {
         }
        detailSuggetionAdapter.update(finalList)
     }
+
+
+    private var isAnimating = false
+
+    private fun animateProductChange(bind: () -> Unit) {
+
+        if (isAnimating) return
+        isAnimating = true
+
+        binding.contentContainer.animate().cancel()
+        binding.viewPagerProductImages.animate().cancel()
+
+        binding.contentContainer.animate()
+            .alpha(0f)
+            .translationY(20f)
+            .setDuration(120)
+            .withEndAction {
+
+                bind()
+
+                binding.contentContainer.translationY = -20f
+                binding.contentContainer.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(200)
+                    .withEndAction {
+                        isAnimating = false
+                    }
+                    .start()
+            }
+            .start()
+
+        binding.viewPagerProductImages.animate()
+            .scaleX(0.96f)
+            .scaleY(0.96f)
+            .alpha(0.7f)
+            .setDuration(120)
+            .withEndAction {
+                binding.viewPagerProductImages.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
+            }
+            .start()
+    }
+    private var suggestionJob: Job? = null
+
+    private fun refreshAdapterDebounced() {
+        suggestionJob?.cancel()
+        suggestionJob = viewLifecycleOwner.lifecycleScope.launch {
+            delay(80) // 🔥 wait for all flows
+            refreshAdapter()
+        }
+    }
+
 
 
 }

@@ -1,5 +1,7 @@
 package com.example.interntask.viewmodels
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.interntask.Data.MainhomeApi
@@ -31,6 +33,8 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
 
     private val _detailItem = MutableStateFlow<Uistate<Product>>(Uistate.Loading())
     val detailItem = _detailItem.asStateFlow()
+
+     val itemstack=mutableListOf<Product>()
 
     private val _detailsuggetionA = MutableStateFlow<Uistate<List<Product>>>(Uistate.Loading())
     val detailsuggetionA = _detailsuggetionA.asStateFlow()
@@ -160,8 +164,13 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
             _toastbestdeal.emit("item getting start")
             _detailItem.emit(Uistate.Loading())
             try {
+                val all =repo.getAllgrid()
+                if(all!=null){
+                    _allGriditem.emit(Uistate.Success(all))
+                }
                 val item=repo.getproductbyId(id)
                 if(item!=null){
+                     itemstack.add(item)
                     _toastbestdeal.emit("item gated")
                     _detailItem.emit(Uistate.Success(item))
                      suggetionAemit(item.category)
@@ -218,6 +227,17 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
                 _detailAllGridshared.emit(emptyList())
             }
 
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    fun popitemstack() {
+        itemstack.removeLast()
+
+        if (itemstack.size >= 1) {
+            viewModelScope.launch {
+                _detailItem.emit(Uistate.Success(itemstack.last()))
+            }
         }
     }
 
