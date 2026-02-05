@@ -128,10 +128,12 @@ class ProductDetailsFragment : Fragment() {
 
                             is Uistate.Loading -> {
                                 binding.detailsprogress.visibility = View.VISIBLE
+                                binding.mainContent.visibility = View.GONE
                             }
 
                             is Uistate.Success -> {
                                 binding.detailsprogress.visibility = View.GONE
+                                binding.mainContent.visibility = View.VISIBLE
                                 animateProductChange { bindProduct(it.data) }
                             }
                         }

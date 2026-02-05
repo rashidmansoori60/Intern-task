@@ -47,7 +47,7 @@ class MainhomeFragment : Fragment() {
     var currentPage = 0
     val displayedItems = mutableListOf<Product>()
 
-    val allmixAdapter = MixallAdapter(displayedItems)
+    lateinit var allmixAdapter :MixallAdapter
 
 
     private var isIndicatorAttached = false
@@ -82,13 +82,7 @@ class MainhomeFragment : Fragment() {
 
         Log.d(TAG, "onviewcreate")
         beastdealAdapter= BestdealAdapter(emptyList()){id ->
-
-            bestdealsVm.getbyId(id)
-            requireActivity()
-                .findNavController(R.id.nav_host)
-                .navigate(R.id.productDetailsFragment)
-
-
+            movetoDetails(id)
         }
 
         adapter= BannerAdapter(mutableListOf())
@@ -100,15 +94,23 @@ class MainhomeFragment : Fragment() {
             LinearLayoutManager.HORIZONTAL,false)
 
 
-        specialProductAdapter= SpecialProductAdapter(emptyList())
+        specialProductAdapter= SpecialProductAdapter(emptyList()){it->
+            movetoDetails(it)
+        }
+
 
         binding.specialProduct.adapter=specialProductAdapter
         binding.specialProduct.layoutManager= GridLayoutManager(requireContext(),3)
 
     //#####################################################################################
-        
+
+
+        allmixAdapter= MixallAdapter(displayedItems){it->
+            movetoDetails(it)
+        }
         binding.allmixgridRecyclerView.layoutManager= GridLayoutManager(requireContext(),2)
         binding.allmixgridRecyclerView.adapter=allmixAdapter
+
 
 
 
@@ -272,5 +274,12 @@ class MainhomeFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "destroy")
+    }
+
+    private fun movetoDetails(id : Int){
+        bestdealsVm.getbyId(id)
+        requireActivity()
+            .findNavController(R.id.nav_host)
+            .navigate(R.id.productDetailsFragment)
     }
 }

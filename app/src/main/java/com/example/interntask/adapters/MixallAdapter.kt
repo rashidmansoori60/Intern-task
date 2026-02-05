@@ -11,7 +11,7 @@ import com.example.interntask.model.Bannermodel.Photo
 import com.example.interntask.model.MainhomeModel.Product
 import javax.inject.Inject
 
-class MixallAdapter @Inject constructor(val product: MutableList<Product>): RecyclerView.Adapter<MixallAdapter.AllitemVh>() {
+class MixallAdapter @Inject constructor(val product: MutableList<Product>,val onclick:(Int)-> Unit): RecyclerView.Adapter<MixallAdapter.AllitemVh>() {
 
     fun additem(data: List<Product>){
         val size=product.size
@@ -33,6 +33,10 @@ class MixallAdapter @Inject constructor(val product: MutableList<Product>): Recy
         Glide.with(holder.itemView).load(item.thumbnail).into(holder.binding.imgProduct)
         holder.binding.txtOriginalPrice.paintFlags =
             holder.binding.txtOriginalPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+
+        holder.itemView.setOnClickListener {
+            onclick(item.id)
+        }
 
     }
 
