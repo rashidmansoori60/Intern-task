@@ -44,5 +44,14 @@ interface MainhomeApi{
         suspend fun getProductById(
             @Path("id") id: Int
         ): Product?
-    }
+
+
+    @GET("products/search")
+    suspend fun searchProducts(
+        @Query("q") query: String,
+        @Query("limit") limit: Int,
+        @Query("skip") skip: Int
+    ): retrofit2.Response<ProductResponse>
+
+}
 

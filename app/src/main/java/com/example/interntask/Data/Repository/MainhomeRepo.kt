@@ -85,4 +85,12 @@ class MainhomeRepo @Inject constructor(val api: MainhomeApi) {
         return api.getProductById(id)
     }
 
+    suspend fun searchproduct(query:String,limit:Int,skip:Int): List<Product>{
+       val result= api.searchProducts(query,limit,skip)
+        if(result.isSuccessful&&result.body()?.products!!.isNotEmpty()){
+            return result.body()!!.products
+        }
+        return emptyList()
+    }
+
 }

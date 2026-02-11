@@ -10,12 +10,16 @@ import com.example.interntask.Uistate.Uistate
 import com.example.interntask.model.MainhomeModel.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -29,6 +33,16 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
 
     private val _batchFlow = MutableSharedFlow<List<Product>>(replay = 0)
     val batchFlow = _batchFlow.asSharedFlow()
+
+
+    private val _seachquery = MutableStateFlow<String>("")
+
+
+    private val _searchflow = MutableStateFlow<Uistate<List<String>>>(Uistate.Loading())
+    val searchflow= _searchflow.asStateFlow()
+
+    private val _searchremain = MutableSharedFlow<List<String>>()
+    val searchremain=_searchremain.asSharedFlow()
 
 
     private val _detailItem = MutableStateFlow<Uistate<Product>>(Uistate.Loading())
@@ -58,12 +72,16 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     val allGriditem: StateFlow<Uistate<List<Product>>> = _allGriditem.asStateFlow()
 
 
+    val searchlimit:Int=20
+    var start:Int=0
 
+    var skip:Int=searchlimit*start
     private val _toastbestdeal = MutableSharedFlow<String>(  extraBufferCapacity = 1)
     val toastbestdeal  =_toastbestdeal.asSharedFlow()
 
     init {
         getBestdeal()
+        searchobserve(searchlimit,skip,false)
     }
 
     fun getBestdeal(){
@@ -242,6 +260,141 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     }
 
 
+   private var searchJob: Job? = null
+//
+//    fun search(q: String, l: Int, s: Int) {
+//
+//        // 3 letter rule
+//        if (q.length < 3) {
+//            viewModelScope.launch {
+//                _searchflow.emit(Uistate.Success(emptyList()))
+//            }
+//            return
+//        }
+//
+//        // cancel previous search
+//        searchJob?.cancel()
+//
+//        searchJob = viewModelScope.launch {
+//
+//            _searchflow.emit(Uistate.Loading())
+//
+//            try {
+//                val result = repo.searchproduct(q, l, s)
+//
+//                // 👉 EMPTY PRODUCT LIST CASE
+//                if (result.isEmpty()) {
+//                    _searchflow.emit(Uistate.Success(emptyList()))
+//                    return@launch
+//                }
+//
+//                val list = result
+//                    .flatMap { product ->
+//                        buildList {
+//                            add(product.title)
+//                            add(product.category)
+//                            addAll(product.tags)
+//                        }
+//                    }
+//                    .distinct()
+//
+//                _searchflow.emit(Uistate.Success(list))
+//
+//            }catch (e: Exception) {
+//                _searchflow.emit(
+//                    Uistate.Error(e.localizedMessage ?: "Something went wrong")
+//                )
+//            }
+//        }
+//    }
+
+    fun searchobserve(l:Int,s:Int,isold: Boolean){
+        if(!isold){
+            searchJob?.cancel()
+            searchJob=viewModelScope.launch {
+                _seachquery.debounce(300).distinctUntilChanged().collect { it->
+                    if(it.length<3){
+                        _searchflow.emit(Uistate.Success(emptyList()))
+                        return@collect
+                    }
+                    try {
+                        val listt= repo.searchproduct(it,l,s)
+                        if(listt.isNotEmpty()){
+                            val list = listt
+                                .flatMap { product ->
+                                    buildList {
+                                        add(product.title)
+                                        add(product.category)
+                                        addAll(product.tags)
+                                    }
+                                }
+                                .distinct()
+
+                            _searchflow.emit(Uistate.Success(list))
+                        }else{
+                            _searchflow.emit(Uistate.Success(emptyList()))
+                        }
+
+                    }catch (e: Exception){
+                        _searchflow.emit(Uistate.Error(e.message.toString()))
+                    }
+
+                }
+            }
+        }
+
+        else {
+            searchJob?.cancel()
+            searchJob = viewModelScope.launch {
+                _seachquery.debounce(300).distinctUntilChanged()
+                    .collect { it ->
+                        if(it.length<3){
+                            _searchremain.emit(emptyList())
+                            return@collect
+                        }
+                        try {
+                            val listt = repo.searchproduct(it, l, s)
+                            if (listt.isNotEmpty()) {
+                                val list = listt
+                                    .flatMap { product ->
+                                        buildList {
+                                            add(product.title)
+                                            add(product.category)
+                                            addAll(product.tags)
+                                        }
+                                    }
+                                    .distinct()
+
+                                _searchremain.emit(list)
+                            } else {
+                                _searchremain.emit(emptyList())
+                            }
+
+                        } catch (e: Exception) {
+                            _searchflow.emit(Uistate.Error(e.message.toString()))
+                        }
+
+                    }
+            }
+            }
+            }
+
+
+            fun onsearchTextchange(text: String) {
+                start = 0
+                skip=0
+                viewModelScope.launch {
+                    _seachquery.value = text
+                }
+            }
+
+
+            fun searchadapterlistener() {
+                start++
+                skip = start * searchlimit
+                searchobserve(searchlimit, skip, true)
+            }
+
 
 //    fun loadNext20() {
 //        if (isLoading) return
@@ -265,5 +418,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
 //            }
 //        }
 //   }
+
+
 
 }
