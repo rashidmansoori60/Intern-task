@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:padding="19dp">
 
     <EditText
@@ -20,12 +21,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="20dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No data available"
+        android:text="No Suggetion found"
         android:id="@+id/nodataText"
         android:textColor="@color/g_gray500"
         android:layout_gravity="center"

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Search Icon -->
+    <ImageView
+        android:id="@+id/ivSearchIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/outline_manage_search_24"
+        app:tint="#757575"/>
+
+    <!-- Suggestion Text -->
+    <TextView
+        android:id="@+id/tvSuggestion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:text="Suggestion text"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <!-- Arrow Icon -->
+    <ImageView
+        android:id="@+id/ivArrow"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/outline_arrow_top_left_24"
+        app:tint="#757575"/>
+
+</LinearLayout>

@@ -312,6 +312,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
         if(!isold){
             searchJob?.cancel()
             searchJob=viewModelScope.launch {
+                _searchflow.emit(Uistate.Loading())
                 _seachquery.debounce(300).distinctUntilChanged().collect { it->
                     if(it.length<3){
                         _searchflow.emit(Uistate.Success(emptyList()))

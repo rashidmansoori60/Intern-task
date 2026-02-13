@@ -80,6 +80,8 @@ class MainhomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         Log.d(TAG, "onviewcreate")
         beastdealAdapter= BestdealAdapter(emptyList()){id ->
             movetoDetails(id)
@@ -282,4 +284,7 @@ class MainhomeFragment : Fragment() {
             .findNavController(R.id.nav_host)
             .navigate(R.id.productDetailsFragment)
     }
+
+
+
 }

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.interntask.Fragments.cetegories_fragment.BeautyFragment
 import com.example.interntask.Fragments.cetegories_fragment.Fashion_Fragment
@@ -45,6 +46,12 @@ class  HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         tabLayout=binding.tabLayout
+
+        binding.searchtab.setOnClickListener {
+                    requireActivity()
+                    .findNavController(R.id.nav_host)
+                    .navigate(R.id.searchtypeFragment)
+        }
 
         val list=arrayListOf<Fragment>(MainhomeFragment(), Fashion_Fragment(), mobile_Fragment(),
             BeautyFragment(), Furniture_Fragment(), accessories_Fragment())

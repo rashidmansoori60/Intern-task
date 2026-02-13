@@ -26,7 +26,7 @@
       android:layout_height="40dp"
       android:orientation="horizontal"
       android:padding="10dp"
-
+      android:id="@+id/searchtab"
       android:layout_gravity="center_horizontal"
       android:layout_marginStart="15dp"
       android:background="@drawable/search_back"
