@@ -10,7 +10,7 @@ import com.example.interntask.databinding.GridItemBinding
 import com.example.interntask.databinding.ProductItemBinding
 import com.example.interntask.model.MainhomeModel.Product
 
-class GridAdapter(var list: MutableList<Product>): RecyclerView.Adapter<GridAdapter.Gridvh>() {
+class GridAdapter(var list: MutableList<Product>,val onclick:(Int)-> Unit): RecyclerView.Adapter<GridAdapter.Gridvh>() {
 
     fun setInitialData(newList: List<Product>) {
         list.clear()
@@ -43,6 +43,10 @@ class GridAdapter(var list: MutableList<Product>): RecyclerView.Adapter<GridAdap
         holder.binding.productPriceafterdiscount.text =
             result.afterDiscountPrice.toIntValue().toINR()
         holder.binding.productDiscount.text = "${result.discountPercentage.toIntValue()}% OFF"
+
+        holder.itemView.setOnClickListener {
+            onclick(result.id)
+        }
 
     }
 

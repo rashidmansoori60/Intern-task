@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.interntask.Data.MainhomeApi
 import com.example.interntask.Data.Repository.MainhomeRepo
+import com.example.interntask.Uistate.Searchstate
 import com.example.interntask.Uistate.Uistate
 import com.example.interntask.model.MainhomeModel.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +39,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     private val _seachquery = MutableStateFlow<String>("")
 
 
-    private val _searchflow = MutableStateFlow<Uistate<List<String>>>(Uistate.Loading())
+    private val _searchflow = MutableStateFlow<Searchstate>(Searchstate.Loading)
     val searchflow= _searchflow.asStateFlow()
 
     private val _searchremain = MutableSharedFlow<List<String>>()
@@ -312,10 +313,10 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
         if(!isold){
             searchJob?.cancel()
             searchJob=viewModelScope.launch {
-                _searchflow.emit(Uistate.Loading())
+                _searchflow.emit(Searchstate.Loading)
                 _seachquery.debounce(300).distinctUntilChanged().collect { it->
                     if(it.length<3){
-                        _searchflow.emit(Uistate.Success(emptyList()))
+                        _searchflow.emit(Searchstate.Livesearch(emptyList()))
                         return@collect
                     }
                     try {
@@ -331,13 +332,13 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
                                 }
                                 .distinct()
 
-                            _searchflow.emit(Uistate.Success(list))
+                            _searchflow.emit(Searchstate.Livesearch(list))
                         }else{
-                            _searchflow.emit(Uistate.Success(emptyList()))
+                            _searchflow.emit(Searchstate.Livesearch(emptyList()))
                         }
 
                     }catch (e: Exception){
-                        _searchflow.emit(Uistate.Error(e.message.toString()))
+                        _searchflow.emit(Searchstate.Error(e.message.toString()))
                     }
 
                 }
@@ -372,7 +373,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
                             }
 
                         } catch (e: Exception) {
-                            _searchflow.emit(Uistate.Error(e.message.toString()))
+                            _searchflow.emit(Searchstate.Error(e.message.toString()))
                         }
 
                     }
@@ -380,7 +381,18 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
             }
             }
 
+    fun searchresult(query:String,limit:Int,skip:Int){
+        viewModelScope.launch {
+            try {
+                val data = repo.searchproduct(query, limit, skip)
+                _searchflow.emit(Searchstate.Resultsproduct(data))
+            }catch (e: Exception){
+                _searchflow.emit(Searchstate.Error(e.message.toString()))
+            }
 
+        }
+
+    }
             fun onsearchTextchange(text: String) {
                 start = 0
                 skip=0

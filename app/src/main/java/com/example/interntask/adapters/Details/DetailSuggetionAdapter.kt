@@ -50,7 +50,7 @@ class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loa
 
           else -> {
               val view = DetailsAllGridBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-                SuggertionAllvh(view, loadmore )
+                SuggertionAllvh(view, loadmore,onclick )
           }
       }
 
@@ -123,12 +123,14 @@ class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loa
         }
     }
 
-    class SuggertionAllvh(val binding: DetailsAllGridBinding,val onLoadMore: () -> Unit): RecyclerView.ViewHolder(binding.root){
+    class SuggertionAllvh(val binding: DetailsAllGridBinding,val onLoadMore: () -> Unit,val onclick: (Int)-> Unit): RecyclerView.ViewHolder(binding.root){
         val rv = binding.detailsAllgridrecycler
 
         private var isLoading = false
         val lm=GridLayoutManager(itemView.context, 2)
-        val adapterrv = GridAdapter(mutableListOf())
+        val adapterrv = GridAdapter(mutableListOf()){it->
+            onclick(it)
+        }
 
         init {
 

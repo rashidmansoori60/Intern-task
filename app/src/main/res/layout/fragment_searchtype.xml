@@ -1,37 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:padding="19dp">
+    android:background="@color/white">
 
-    <EditText
-        android:id="@+id/etSearch"
+    <!-- Main Content -->
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="Search products"
-        android:padding="10dp"
-        android:background="@drawable/search_back"
-        android:inputType="text"/>
+        android:layout_height="match_parent"
+        android:padding="19dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSuggestions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginTop="20dp"/>
+        <!-- Search Field -->
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Search products"
+            android:padding="10dp"
+            android:background="@drawable/search_back"
+            android:inputType="text"
+            android:imeOptions="actionSearch"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No Suggetion found"
-        android:id="@+id/nodataText"
-        android:textColor="@color/g_gray500"
+        <!-- Suggestion List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSuggestions"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:layout_marginTop="12dp"/>
+
+        <!-- Product List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvProducts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone"/>
+
+        <!-- No Data Text -->
+        <TextView
+            android:id="@+id/nodataText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No Suggestion Found"
+            android:textColor="@color/g_gray500"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="20dp"/>
+
+    </LinearLayout>
+
+    <!-- Center ProgressBar (Overlay) -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
-        android:visibility="visible"
-        android:layout_marginTop="300dp"/>
+        android:visibility="gone"/>
 
+</FrameLayout>
 
-</LinearLayout>
