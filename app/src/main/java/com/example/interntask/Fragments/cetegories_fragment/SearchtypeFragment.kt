@@ -13,10 +13,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.interntask.R
 import com.example.interntask.Uistate.Searchstate
 import com.example.interntask.Uistate.Uistate
+import com.example.interntask.adapters.Searchfragment.ResultproductsAdapter
 import com.example.interntask.adapters.Searchfragment.Searchadapter
 import com.example.interntask.adapters.SpecialProductAdapter
 import com.example.interntask.databinding.FragmentMainhomeBinding
@@ -36,6 +39,8 @@ class SearchtypeFragment : Fragment() {
 
     lateinit var adapter: Searchadapter
 
+    lateinit var resultadapter: ResultproductsAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,10 +53,24 @@ class SearchtypeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter= Searchadapter(mutableListOf())
+        adapter= Searchadapter(mutableListOf()){
+            bestdealsVm.searchresult(it)
+        }
         binding.rvSuggestions.layoutManager= LinearLayoutManager(requireContext())
         binding.rvSuggestions.adapter=adapter
 
+
+
+        resultadapter= ResultproductsAdapter(mutableListOf(), onItemClick = {it->
+
+            movetoDetails(it)
+
+        }, onAddToCartClick = {
+
+        }
+        )
+        binding.rvProducts.adapter=resultadapter
+        binding.rvProducts.layoutManager= LinearLayoutManager(requireContext())
 
         binding.etSearch.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(
@@ -108,11 +127,19 @@ class SearchtypeFragment : Fragment() {
                               showLoading()
                         }
                         is Searchstate.Recentsearch -> {
+                            if(it.list.isEmpty()){
+                                showNoData()
+                            }
 
                         }
 
                         is Searchstate.Resultsproduct -> {
-                            showProducts()
+                            if(it.products.isEmpty()){
+                                showNoData()
+                            }else{
+                                showProducts(false)
+                                resultadapter.submitlist(it.products,false)
+                            }
 
                         }
                     }
@@ -130,7 +157,7 @@ class SearchtypeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adapter.submitlist(emptyList(),false)
+       bestdealsVm.resetSearchState()
     }
 
     private fun showLoading() {
@@ -147,7 +174,14 @@ class SearchtypeFragment : Fragment() {
         binding.nodataText.visibility = View.GONE
     }
 
-    private fun showProducts() {
+    private fun showProducts(empty: Boolean) {
+        if(empty){
+            binding.nodataText.visibility = View.VISIBLE
+            binding.rvProducts.visibility = View.GONE
+            binding.rvSuggestions.visibility = View.GONE
+            binding.progressBar.visibility = View.GONE
+
+        }
         binding.progressBar.visibility = View.GONE
         binding.rvSuggestions.visibility = View.GONE
         binding.rvProducts.visibility = View.VISIBLE
@@ -159,6 +193,24 @@ class SearchtypeFragment : Fragment() {
         binding.rvSuggestions.visibility = View.GONE
         binding.rvProducts.visibility = View.GONE
         binding.nodataText.visibility = View.VISIBLE
+    }
+
+
+    private fun movetoDetails(id : Int){
+        bestdealsVm.getbyId(id)
+        val navController = requireActivity()
+            .findNavController(R.id.nav_host)
+
+        val navOptions = NavOptions.Builder()
+            .setPopUpTo(R.id.searchFragment, true) // true = inclusive
+            .build()
+
+        navController.navigate(
+            R.id.productDetailsFragment,
+            null,
+            navOptions
+        )
+
     }
 
 }

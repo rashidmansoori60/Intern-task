@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.interntask.databinding.SearchsuggetionItemBinding
 
-class Searchadapter(var list: MutableList<String>): RecyclerView.Adapter<Searchadapter.vh>() {
+class Searchadapter(var list: MutableList<String>,val onclick:(String)->Unit): RecyclerView.Adapter<Searchadapter.vh>() {
 
 
     fun submitlist(newlist: List<String>,isold: Boolean){
@@ -38,6 +38,9 @@ class Searchadapter(var list: MutableList<String>): RecyclerView.Adapter<Searcha
     ) {
         var item=list[position]
         holder.binding.tvSuggestion.text=item
+        holder.itemView.setOnClickListener {
+            onclick(item)
+        }
 
     }
 

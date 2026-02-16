@@ -1,5 +1,6 @@
 package com.example.interntask.adapters.Searchfragment
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -8,22 +9,39 @@ import com.example.interntask.helper.toIntValue
 import com.example.interntask.model.MainhomeModel.Product
 
 class ResultproductsAdapter(var product: MutableList<Product>,val onItemClick: (Int) -> Unit,val onAddToCartClick: (Product) -> Unit): RecyclerView.Adapter<ResultproductsAdapter.ProductViewHolder>() {
+
+
+    fun submitlist(newlist: List<Product>, isold: Boolean){
+
+        if(isold){
+            var startposition=this.product.size
+            this.product.addAll(newlist)
+            notifyItemRangeInserted(startposition,newlist.size)
+        }
+        else{
+            this.product.clear()
+            this.product.addAll(newlist)
+            notifyDataSetChanged()
+        }
+
+    }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ProductViewHolder {
-
+       val binding= ItemProductlistBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+       return ProductViewHolder(binding)
     }
 
     override fun onBindViewHolder(
         holder: ProductViewHolder,
         position: Int
     ) {
-
+        holder.bind(product[position])
     }
 
     override fun getItemCount(): Int {
-
+return product.size
     }
 
     inner class ProductViewHolder(val binding: ItemProductlistBinding) :

@@ -1,6 +1,7 @@
 package com.example.interntask.viewmodels
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,7 +40,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     private val _seachquery = MutableStateFlow<String>("")
 
 
-    private val _searchflow = MutableStateFlow<Searchstate>(Searchstate.Loading)
+    private val _searchflow = MutableStateFlow<Searchstate>(Searchstate.Recentsearch(emptyList()))
     val searchflow= _searchflow.asStateFlow()
 
     private val _searchremain = MutableSharedFlow<List<String>>()
@@ -77,6 +78,14 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     var start:Int=0
 
     var skip:Int=searchlimit*start
+
+    val resultlimit:Int=20
+    var resultstart:Int=0
+
+    var resultskip:Int=resultstart*resultlimit
+
+
+
     private val _toastbestdeal = MutableSharedFlow<String>(  extraBufferCapacity = 1)
     val toastbestdeal  =_toastbestdeal.asSharedFlow()
 
@@ -381,18 +390,30 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
             }
             }
 
-    fun searchresult(query:String,limit:Int,skip:Int){
-        viewModelScope.launch {
+    private var searchresultJob: Job? = null
+    fun searchresult(query:String,limit:Int=resultlimit,skip:Int=resultskip){
+        searchresultJob?.cancel()
+
+       searchresultJob= viewModelScope.launch {
+            _searchflow.emit(Searchstate.Loading)
             try {
                 val data = repo.searchproduct(query, limit, skip)
-                _searchflow.emit(Searchstate.Resultsproduct(data))
+                if(data.size<1){
+                    _searchflow.emit(Searchstate.Resultsproduct(emptyList()))
+                }else{
+                    _searchflow.emit(Searchstate.Resultsproduct(data))
+                }
+                Log.e("searchsize", data.size.toString())
             }catch (e: Exception){
                 _searchflow.emit(Searchstate.Error(e.message.toString()))
+                Log.e("searchsize", e.message.toString())
+
             }
 
         }
 
     }
+
             fun onsearchTextchange(text: String) {
                 start = 0
                 skip=0
@@ -400,6 +421,11 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
                     _seachquery.value = text
                 }
             }
+
+
+    fun resetSearchState() {
+        _searchflow.value = Searchstate.Recentsearch(emptyList())   // default value
+    }
 
 
             fun searchadapterlistener() {
