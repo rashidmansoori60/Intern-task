@@ -1,6 +1,8 @@
 package com.example.interntask.Data.Repository
 
 import android.util.Log
+import com.example.interntask.Data.Local.Search.SearchDAO
+import com.example.interntask.Data.Local.Search.SearchEntity
 import com.example.interntask.Data.MainhomeApi
 import com.example.interntask.model.MainhomeModel.Product
 import com.example.interntask.model.MainhomeModel.ProductResponse
@@ -11,7 +13,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import okhttp3.Response
 
-class MainhomeRepo @Inject constructor(val api: MainhomeApi) {
+class MainhomeRepo @Inject constructor(val api: MainhomeApi,val dao: SearchDAO) {
 
    private val listofCetegories= listOf(
         "beauty",
@@ -91,6 +93,20 @@ class MainhomeRepo @Inject constructor(val api: MainhomeApi) {
             return result.body()!!.products
         }
         return emptyList()
+    }
+
+
+    suspend fun getloacalsearchdata(): List<SearchEntity>{
+        var list=mutableListOf<SearchEntity>()
+       dao.getallsearch().collect { it->
+           list.clear()
+           list.addAll(it)
+        }
+       return list
+    }
+
+    suspend fun addroom(value:String){
+        dao.insert(SearchEntity(query = value))
     }
 
 }

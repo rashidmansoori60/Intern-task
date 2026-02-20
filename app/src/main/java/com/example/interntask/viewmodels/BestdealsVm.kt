@@ -36,11 +36,11 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     private val _batchFlow = MutableSharedFlow<List<Product>>(replay = 0)
     val batchFlow = _batchFlow.asSharedFlow()
 
-
+    val localsearch=mutableListOf<String>()
     private val _seachquery = MutableStateFlow<String>("")
 
 
-    private val _searchflow = MutableStateFlow<Searchstate>(Searchstate.Recentsearch(emptyList()))
+    private val _searchflow = MutableStateFlow<Searchstate>(Searchstate.Recentsearch(localsearch))
     val searchflow= _searchflow.asStateFlow()
 
     private val _searchremain = MutableSharedFlow<List<String>>()
@@ -92,6 +92,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     init {
         getBestdeal()
         searchobserve(searchlimit,skip,false)
+        getlocalsearch()
     }
 
     fun getBestdeal(){
@@ -392,10 +393,15 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
 
     private var searchresultJob: Job? = null
     fun searchresult(query:String,limit:Int=resultlimit,skip:Int=resultskip){
+        Log.e("searchsize", "searchcall")
+
         searchresultJob?.cancel()
 
+
        searchresultJob= viewModelScope.launch {
-            _searchflow.emit(Searchstate.Loading)
+           _toastbestdeal.emit("searchresult")
+
+           _searchflow.emit(Searchstate.Loading)
             try {
                 val data = repo.searchproduct(query, limit, skip)
                 if(data.size<1){
@@ -424,7 +430,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
 
 
     fun resetSearchState() {
-        _searchflow.value = Searchstate.Recentsearch(emptyList())   // default value
+        _searchflow.value = Searchstate.Recentsearch(localsearch)   // default value
     }
 
 
@@ -458,6 +464,29 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
 //        }
 //   }
 
+    fun getlocalsearch(){
+        viewModelScope.launch {
+        repo.getloacalsearchdata().forEach { it->
+            localsearch.add(it.query)
+        }
+        }
+    }
+
+
+    fun addroom(value:String){
+        Log.e("searchsize", "addroomcall")
+        viewModelScope.launch {
+            try {
+                repo.addroom(value)
+                _toastbestdeal.emit("added")
+                Log.e("searchsize", "added")
+
+            }
+            catch (e: Exception){
+                _toastbestdeal.emit(e.message.toString())
+            }
+        }
+    }
 
 
 }

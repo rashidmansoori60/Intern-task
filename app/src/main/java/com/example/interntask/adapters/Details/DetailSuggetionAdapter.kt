@@ -20,7 +20,7 @@ class DetailSuggetionAdapter(var list: MutableList<DetailsAll_itemmodel>,val loa
 
     fun update(list: MutableList<DetailsAll_itemmodel>){
         this.list=list
-        notifyDataSetChanged()
+        notifyItemChanged(this.list.size)
     }
     override fun getItemViewType(position: Int): Int {
         return when (list[position]) {

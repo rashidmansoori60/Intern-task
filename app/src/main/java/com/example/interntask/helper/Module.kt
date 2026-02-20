@@ -1,12 +1,17 @@
 package com.example.interntask.helper
 
+import android.app.Application
+import androidx.room.Room
 import com.example.interntask.Data.Apiservice
+import com.example.interntask.Data.Local.Search.SearchDAO
+import com.example.interntask.Data.Local.Search.SearchDatabase
 import com.example.interntask.Data.MainhomeApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.internal.Contexts
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -36,5 +41,17 @@ object Module {
         return Retrofit.Builder().baseUrl("https://dummyjson.com/").addConverterFactory(
             GsonConverterFactory.create()).build().create(MainhomeApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun getDatabase(contexts: Application): SearchDatabase{
+      return Room.databaseBuilder(contexts, SearchDatabase::class.java,"roomdb").fallbackToDestructiveMigration().build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun getDao(searchDatabase: SearchDatabase): SearchDAO=
+        searchDatabase.getdao()
 
 }

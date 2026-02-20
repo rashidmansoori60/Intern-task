@@ -53,7 +53,8 @@ class SearchtypeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter= Searchadapter(mutableListOf()){
+        adapter= Searchadapter(mutableListOf()){it->
+            bestdealsVm.addroom(it)
             bestdealsVm.searchresult(it)
         }
         binding.rvSuggestions.layoutManager= LinearLayoutManager(requireContext())
@@ -129,7 +130,12 @@ class SearchtypeFragment : Fragment() {
                         is Searchstate.Recentsearch -> {
                             if(it.list.isEmpty()){
                                 showNoData()
+                            }else{
+                                binding.rvSuggestions.visibility = View.VISIBLE
+                                binding.nodataText.visibility = View.GONE
+                                adapter.submitlist(it.list,false)
                             }
+
 
                         }
 

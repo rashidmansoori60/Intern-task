@@ -33,6 +33,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlin.getValue
 @AndroidEntryPoint
@@ -64,7 +66,7 @@ class ProductDetailsFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.e("productdetails","onviewcreted")
+        Log.e("productdetails", "onviewcreted")
 
 
         requireActivity()
@@ -73,10 +75,9 @@ class ProductDetailsFragment : Fragment() {
 
                 // agar stack me previous item hai
                 if (bestdealsVm.itemstack.size > 1) {
-                        bestdealsVm.popitemstack()
-                //    findNavController().popBackStack()
-                }
-                else if(bestdealsVm.itemstack.size==1) {
+                    bestdealsVm.popitemstack()
+                    //    findNavController().popBackStack()
+                } else if (bestdealsVm.itemstack.size == 1) {
                     bestdealsVm.popitemstack()
                     findNavController().popBackStack()
                 }
@@ -88,13 +89,14 @@ class ProductDetailsFragment : Fragment() {
 
 
 
-        detailSuggetionAdapter = DetailSuggetionAdapter(mutableListOf(),
+        detailSuggetionAdapter = DetailSuggetionAdapter(
+            mutableListOf(),
             loadmore = {
                 viewLifecycleOwner.lifecycleScope.launch {
-                      bestdealsVm.detailAllitememitshared()
-                 }
+                    bestdealsVm.detailAllitememitshared()
+                }
             },
-            onclick = {it->
+            onclick = { it ->
                 bestdealsVm.getbyId(it)
 //                requireActivity()
 //                    .findNavController(R.id.nav_host)
@@ -105,19 +107,19 @@ class ProductDetailsFragment : Fragment() {
 
 
 
-        binding.MainRvSuggestions.layoutManager= LinearLayoutManager(requireContext())
+        binding.MainRvSuggestions.layoutManager = LinearLayoutManager(requireContext())
 
         binding.MainRvSuggestions.adapter = detailSuggetionAdapter
 
 
         viewLifecycleOwner.lifecycleScope.launch {
-            bestdealsVm.detailAllGridshared.collect { it->
+            bestdealsVm.detailAllGridshared.collect { it ->
                 detailSuggetionAdapter.addmoreGriditem(it)
-             }
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     bestdealsVm.detailItem.collect { it ->
                         when (it) {
@@ -148,146 +150,177 @@ class ProductDetailsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                launch {
-                    bestdealsVm.detailsuggetionA.collect { it ->
-                        when (it) {
-                            is Uistate.Loading -> {}
-
-                            is Uistate.Success -> {
-                                Toast.makeText(requireContext(),it.data.size.toString()+"A", Toast.LENGTH_LONG).show()
-                                mutableList.removeAll{it is DetailsAll_itemmodel.SuggetionA}
-                                mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
-                                refreshAdapterDebounced()
-                               // detailSuggetionAdapter.update(DetailsAll_itemmodel.SuggetionA(it.data))
-
-//                                if (mutableList.none { it is DetailsAll_itemmodel.SuggetionA }) {
-////                                    mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
-////                                    detailSuggetionAdapter.update(mutableList.toList())
-//                                }
-                            }
-
-                            is Uistate.Error -> {}
-
-
-                        }
-                    }
+                combine(
+                    bestdealsVm.detailsuggetionA,
+                    bestdealsVm.detailsuggetionB,
+                    bestdealsVm.allGriditem
+                ) { a, b, c ->
+                    Triple(a, b, c)
                 }
-                launch {
-                    bestdealsVm.detailsuggetionB.collect { it ->
-                        when (it) {
-                            is Uistate.Loading -> {
+                    .catch { e ->
+                        Log.e("combineError", e.message.toString())
+                    }.collect { (a, b, c) ->
+                        val finalList = mutableListOf<DetailsAll_itemmodel>()
 
-                            }
-
-                            is Uistate.Success -> {
-                                Toast.makeText(requireContext(),it.data.size.toString()+"B", Toast.LENGTH_LONG).show()
-                                mutableList.removeAll{it is DetailsAll_itemmodel.SuggetionB}
-                                mutableList.add(DetailsAll_itemmodel.SuggetionB (it.data))
-                                refreshAdapterDebounced()
-                               // detailSuggetionAdapter.update(DetailsAll_itemmodel.SuggetionB(it.data))
-//                                if (mutableList.none { it is DetailsAll_itemmodel.SuggetionB }) {
-//
-//
-////                                    mutableList.add(DetailsAll_itemmodel.SuggetionB(it.data))
-////                                    detailSuggetionAdapter.update(mutableList.toList())
-//                                }
-                            }
-
-                            is Uistate.Error -> {
-
-                            }
-
+                        if (a is Uistate.Success) {
+                            finalList.add(DetailsAll_itemmodel.SuggetionA(a.data))
                         }
-                    }
 
-                }
-                launch {
-                    bestdealsVm.allGriditem.collect { it ->
-                        when (it) {
-                            is Uistate.Loading -> {
-
-                            }
-
-                            is Uistate.Success -> {
-                                Toast.makeText(requireContext(),it.data.size.toString()+"Allll", Toast.LENGTH_LONG).show()
-
-                                mutableList.removeAll{it is DetailsAll_itemmodel.Allproduct}
-                                mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
-                                refreshAdapterDebounced()
-//                                if (mutableList.none { it is DetailsAll_itemmodel.Allproduct }) {
-//                                    detailSuggetionAdapter.update(DetailsAll_itemmodel.Allproduct(it.data))
-////                                    mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
-////                                    detailSuggetionAdapter.update(mutableList.toList())
-//                                }
-
-                            }
-
-                            is Uistate.Error -> {
-
-                            }
-
+                        if (b is Uistate.Success) {
+                            finalList.add(DetailsAll_itemmodel.SuggetionB(b.data))
                         }
-                    }
 
-                }
+                        if (c is Uistate.Success) {
+                            finalList.add(DetailsAll_itemmodel.Allproduct(c.data))
+                        }
+
+                        detailSuggetionAdapter.update(finalList)
+
+                    }
 
             }
+        }
+    }
+//                launch {
+//                    bestdealsVm.detailsuggetionA.collect { it ->
+//                        when (it) {
+//                            is Uistate.Loading -> {}
+//
+//                            is Uistate.Success -> {
+//                                Toast.makeText(requireContext(),it.data.size.toString()+"A", Toast.LENGTH_LONG).show()
+//                                mutableList.removeAll{it is DetailsAll_itemmodel.SuggetionA}
+//                                mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
+//                                refreshAdapterDebounced()
+//                               // detailSuggetionAdapter.update(DetailsAll_itemmodel.SuggetionA(it.data))
+//
+////                                if (mutableList.none { it is DetailsAll_itemmodel.SuggetionA }) {
+//////                                    mutableList.add(DetailsAll_itemmodel.SuggetionA(it.data))
+//////                                    detailSuggetionAdapter.update(mutableList.toList())
+////                                }
+//                            }
+//
+//                            is Uistate.Error -> {}
+//
+//
+//                        }
+//                    }
+//                }
+//                launch {
+//                    bestdealsVm.detailsuggetionB.collect { it ->
+//                        when (it) {
+//                            is Uistate.Loading -> {
+//
+//                            }
+//
+//                            is Uistate.Success -> {
+//                                Toast.makeText(requireContext(),it.data.size.toString()+"B", Toast.LENGTH_LONG).show()
+//                                mutableList.removeAll{it is DetailsAll_itemmodel.SuggetionB}
+//                                mutableList.add(DetailsAll_itemmodel.SuggetionB (it.data))
+//                                refreshAdapterDebounced()
+//                               // detailSuggetionAdapter.update(DetailsAll_itemmodel.SuggetionB(it.data))
+////                                if (mutableList.none { it is DetailsAll_itemmodel.SuggetionB }) {
+////
+////
+//////                                    mutableList.add(DetailsAll_itemmodel.SuggetionB(it.data))
+//////                                    detailSuggetionAdapter.update(mutableList.toList())
+////                                }
+//                            }
+//
+//                            is Uistate.Error -> {
+//
+//                            }
+//
+//                        }
+//                    }
+//
+//                }
+//                launch {
+//                    bestdealsVm.allGriditem.collect { it ->
+//                        when (it) {
+//                            is Uistate.Loading -> {
+//
+//                            }
+//
+//                            is Uistate.Success -> {
+//                                Toast.makeText(requireContext(),it.data.size.toString()+"Allll", Toast.LENGTH_LONG).show()
+//
+//                                mutableList.removeAll{it is DetailsAll_itemmodel.Allproduct}
+//                                mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
+//                                refreshAdapterDebounced()
+////                                if (mutableList.none { it is DetailsAll_itemmodel.Allproduct }) {
+////                                    detailSuggetionAdapter.update(DetailsAll_itemmodel.Allproduct(it.data))
+//////                                    mutableList.add(DetailsAll_itemmodel.Allproduct(it.data))
+//////                                    detailSuggetionAdapter.update(mutableList.toList())
+////                                }
+//
+//                            }
+//
+//                            is Uistate.Error -> {
+//
+//                            }
+//
+//                        }
+//                    }
+//
+//                }
+//
+//            }
+//
+//
+//
+//        }}
 
+        @RequiresApi(Build.VERSION_CODES.M)
+        private fun bindProduct(product: Product) = with(binding) {
 
+            binding.scrollView.scrollTo(0, 0)
 
-        }}
+            // ---------- BASIC INFO ----------
+            tvTitle.text = product.title
+            tvDescription.text = product.description
 
-            @RequiresApi(Build.VERSION_CODES.M)
-            private fun bindProduct(product: Product) = with(binding) {
+            // ---------- RATING ----------
+            tvRating.text = String.format("%.1f", product.rating)
+            tvReviewCount.text = "(${product.reviews.size})"
 
-                binding.scrollView.scrollTo(0, 0)
+            // ---------- PRICE CALCULATION ----------
+            val discountedPrice =
+                product.price - (product.price * product.discountPercentage / 100)
 
-                // ---------- BASIC INFO ----------
-                tvTitle.text = product.title
-                tvDescription.text = product.description
+            tvDiscountPercent.text = "${product.discountPercentage.toInt()}%"
+            tvOriginalPrice.text = "₹${product.price}"
+            tvDiscountedPrice.text = "₹${String.format("%.2f", discountedPrice)}"
 
-                // ---------- RATING ----------
-                tvRating.text = String.format("%.1f", product.rating)
-                tvReviewCount.text = "(${product.reviews.size})"
-
-                // ---------- PRICE CALCULATION ----------
-                val discountedPrice =
-                    product.price - (product.price * product.discountPercentage / 100)
-
-                tvDiscountPercent.text = "${product.discountPercentage.toInt()}%"
-                tvOriginalPrice.text = "₹${product.price}"
-                tvDiscountedPrice.text = "₹${String.format("%.2f", discountedPrice)}"
-
-                // ---------- STOCK / AVAILABILITY ----------
-                if (product.availabilityStatus.equals("In Stock", true) && product.stock > 0) {
-                    tvStock.text = "In stock"
-                    tvStock.setTextColor(requireContext().getColor(R.color.g_green))
-                } else {
-                    tvStock.text = "Out of stock"
-                    tvStock.setTextColor(Color.RED)
-                }
-
-                // ---------- PRODUCT DETAILS ----------
-                tvBrand.text = product.brand ?: "N/A"
-                tvSku.text = product.sku
-                tvWeight.text = "${product.weight} g"
-
-                tvDimensions.text =
-                    "${product.dimensions.width} × ${product.dimensions.height} × ${product.dimensions.depth} cm"
-
-                tvWarranty.text = product.warrantyInformation
-                tvShipping.text = product.shippingInformation
-
-                // ---------- VIEWPAGER IMAGES ----------
-
-                vpAdapter.submitList(product.images)
-
+            // ---------- STOCK / AVAILABILITY ----------
+            if (product.availabilityStatus.equals("In Stock", true) && product.stock > 0) {
+                tvStock.text = "In stock"
+                tvStock.setTextColor(requireContext().getColor(R.color.g_green))
+            } else {
+                tvStock.text = "Out of stock"
+                tvStock.setTextColor(Color.RED)
             }
+
+            // ---------- PRODUCT DETAILS ----------
+            tvBrand.text = product.brand ?: "N/A"
+            tvSku.text = product.sku
+            tvWeight.text = "${product.weight} g"
+
+            tvDimensions.text =
+                "${product.dimensions.width} × ${product.dimensions.height} × ${product.dimensions.depth} cm"
+
+            tvWarranty.text = product.warrantyInformation
+            tvShipping.text = product.shippingInformation
+
+            // ---------- VIEWPAGER IMAGES ----------
+
+            vpAdapter.submitList(product.images)
+
+        }
 
 
         override fun onResume() {
             super.onResume()
-            Log.e("productdetails","onresume")
+            Log.e("productdetails", "onresume")
             requireActivity()
                 .findViewById<BottomNavigationView>(R.id.bottom_navigation)
                 .isVisible = false
@@ -296,98 +329,97 @@ class ProductDetailsFragment : Fragment() {
         override fun onDestroyView() {
             super.onDestroyView()
             _binding = null
-            Log.e("productdetails","onDestroyview")
+            Log.e("productdetails", "onDestroyview")
             requireActivity()
                 .findViewById<BottomNavigationView>(R.id.bottom_navigation)
                 .isVisible = true
         }
 
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.e("productdetails","onDestroy")
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.e("productdetails","onDestroy")
-    }
-    private fun refreshAdapter() {
-        val finalList = mutableListOf<DetailsAll_itemmodel>()
-
-        mutableList.find { it is DetailsAll_itemmodel.SuggetionA }?.let {
-            finalList.add(it)
+        override fun onDestroy() {
+            super.onDestroy()
+            Log.e("productdetails", "onDestroy")
         }
 
-        mutableList.find { it is DetailsAll_itemmodel.SuggetionB }?.let {
-            finalList.add(it)
-
+        override fun onDetach() {
+            super.onDetach()
+            Log.e("productdetails", "onDestroy")
         }
 
-        mutableList.find { it is DetailsAll_itemmodel.Allproduct }?.let {
-            finalList.add(it)
+        private fun refreshAdapter() {
+            val finalList = mutableListOf<DetailsAll_itemmodel>()
 
-        }
-       detailSuggetionAdapter.update(finalList)
-    }
-
-
-    private var isAnimating = false
-
-    private fun animateProductChange(bind: () -> Unit) {
-
-        if (isAnimating) return
-        isAnimating = true
-
-        binding.contentContainer.animate().cancel()
-        binding.viewPagerProductImages.animate().cancel()
-
-        binding.contentContainer.animate()
-            .alpha(0f)
-            .translationY(20f)
-            .setDuration(120)
-            .withEndAction {
-
-                bind()
-
-                binding.contentContainer.translationY = -20f
-                binding.contentContainer.animate()
-                    .alpha(1f)
-                    .translationY(0f)
-                    .setDuration(200)
-                    .withEndAction {
-                        isAnimating = false
-                    }
-                    .start()
+            mutableList.find { it is DetailsAll_itemmodel.SuggetionA }?.let {
+                finalList.add(it)
             }
-            .start()
 
-        binding.viewPagerProductImages.animate()
-            .scaleX(0.96f)
-            .scaleY(0.96f)
-            .alpha(0.7f)
-            .setDuration(120)
-            .withEndAction {
-                binding.viewPagerProductImages.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .alpha(1f)
-                    .setDuration(200)
-                    .start()
+            mutableList.find { it is DetailsAll_itemmodel.SuggetionB }?.let {
+                finalList.add(it)
+
             }
-            .start()
-    }
-    private var suggestionJob: Job? = null
 
-    private fun refreshAdapterDebounced() {
-        suggestionJob?.cancel()
-        suggestionJob = viewLifecycleOwner.lifecycleScope.launch {
-            delay(80) // 🔥 wait for all flows
-            refreshAdapter()
+            mutableList.find { it is DetailsAll_itemmodel.Allproduct }?.let {
+                finalList.add(it)
+
+            }
+            detailSuggetionAdapter.update(finalList)
+        }
+
+
+        private var isAnimating = false
+
+        private fun animateProductChange(bind: () -> Unit) {
+
+            if (isAnimating) return
+            isAnimating = true
+
+            binding.contentContainer.animate().cancel()
+            binding.viewPagerProductImages.animate().cancel()
+
+            binding.contentContainer.animate()
+                .alpha(0f)
+                .translationY(20f)
+                .setDuration(120)
+                .withEndAction {
+
+                    bind()
+
+                    binding.contentContainer.translationY = -20f
+                    binding.contentContainer.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setDuration(200)
+                        .withEndAction {
+                            isAnimating = false
+                        }
+                        .start()
+                }
+                .start()
+
+            binding.viewPagerProductImages.animate()
+                .scaleX(0.96f)
+                .scaleY(0.96f)
+                .alpha(0.7f)
+                .setDuration(120)
+                .withEndAction {
+                    binding.viewPagerProductImages.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .alpha(1f)
+                        .setDuration(200)
+                        .start()
+                }
+                .start()
+        }
+
+        private var suggestionJob: Job? = null
+
+        private fun refreshAdapterDebounced() {
+            suggestionJob?.cancel()
+            suggestionJob = viewLifecycleOwner.lifecycleScope.launch {
+                delay(80) // 🔥 wait for all flows
+                refreshAdapter()
+            }
         }
     }
 
-
-
-}
