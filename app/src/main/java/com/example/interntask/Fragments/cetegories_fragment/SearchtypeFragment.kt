@@ -129,8 +129,10 @@ class SearchtypeFragment : Fragment() {
                         }
                         is Searchstate.Recentsearch -> {
                             if(it.list.isEmpty()){
+                                Log.d("ROOM_CHECK", "Data: empty")
                                 showNoData()
                             }else{
+                                Log.d("ROOM_CHECK", "Data: ${it.list}")
                                 binding.rvSuggestions.visibility = View.VISIBLE
                                 binding.nodataText.visibility = View.GONE
                                 adapter.submitlist(it.list,false)

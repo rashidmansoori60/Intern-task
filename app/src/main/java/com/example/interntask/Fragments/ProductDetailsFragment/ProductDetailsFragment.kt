@@ -98,9 +98,9 @@ class ProductDetailsFragment : Fragment() {
             },
             onclick = { it ->
                 bestdealsVm.getbyId(it)
-//                requireActivity()
-//                    .findNavController(R.id.nav_host)
-//                    .navigate(R.id.productDetailsFragment)
+                requireActivity()
+                    .findNavController(R.id.nav_host)
+                    .navigate(R.id.productDetailsFragment)
             })
 
 

@@ -326,7 +326,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
                 _searchflow.emit(Searchstate.Loading)
                 _seachquery.debounce(300).distinctUntilChanged().collect { it->
                     if(it.length<3){
-                        _searchflow.emit(Searchstate.Livesearch(emptyList()))
+                        _searchflow.emit(Searchstate.Recentsearch(localsearch))
                         return@collect
                     }
                     try {
@@ -465,6 +465,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
 //   }
 
     fun getlocalsearch(){
+        Log.e("ROOM_CHECK", "getlocalobserve")
         viewModelScope.launch {
         repo.getloacalsearchdata().forEach { it->
             localsearch.add(it.query)
@@ -479,7 +480,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
             try {
                 repo.addroom(value)
                 _toastbestdeal.emit("added")
-                Log.e("searchsize", "added")
+                Log.e("ROOM_CHECK", "added")
 
             }
             catch (e: Exception){
