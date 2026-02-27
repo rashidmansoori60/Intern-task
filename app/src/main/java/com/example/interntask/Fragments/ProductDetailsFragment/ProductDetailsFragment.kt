@@ -77,7 +77,7 @@ class ProductDetailsFragment : Fragment() {
                 if (bestdealsVm.itemstack.size > 1) {
                     bestdealsVm.popitemstack()
                     //    findNavController().popBackStack()
-                } else if (bestdealsVm.itemstack.size == 1) {
+                } else if(bestdealsVm.itemstack.size==1){
                     bestdealsVm.popitemstack()
                     findNavController().popBackStack()
                 }
@@ -98,9 +98,7 @@ class ProductDetailsFragment : Fragment() {
             },
             onclick = { it ->
                 bestdealsVm.getbyId(it)
-                requireActivity()
-                    .findNavController(R.id.nav_host)
-                    .navigate(R.id.productDetailsFragment)
+
             })
 
 

@@ -200,6 +200,7 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
                 val item=repo.getproductbyId(id)
                 if(item!=null){
                      itemstack.add(item)
+                    Log.e("searchsize", itemstack.size.toString())
                     _toastbestdeal.emit("item gated")
                     _detailItem.emit(Uistate.Success(item))
                      suggetionAemit(item.category)
@@ -262,9 +263,10 @@ class BestdealsVm @Inject constructor(val repo: MainhomeRepo): ViewModel() {
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun popitemstack() {
         itemstack.removeLast()
-
+        Log.e("searchsize", itemstack.size.toString())
         if (itemstack.size >= 1) {
             viewModelScope.launch {
+                _toastbestdeal.emit("pop")
                 _detailItem.emit(Uistate.Success(itemstack.last()))
             }
         }
